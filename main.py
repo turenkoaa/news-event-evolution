@@ -1,6 +1,6 @@
 import datetime
 import pandas as pd
-from keywords_extractor import get_keywords, get_names
+from keywords_extractor import get_keywords, get_persons, get_locations
 from ner import TextFeatures
 import json
 from pprint import pprint
@@ -13,14 +13,25 @@ d2 = datetime.date(2018, 10, 21)  # end date
 
 dates = get_dates_between(d1, d2)
 
-names = []
+persons = []
+locations = []
 for date in dates:
     news = get_russian_news(date)
     for story in news:
-        new_names = get_names(story['vanilla'])
-        print(str(len(new_names)) + " persons were found for story=" + str(story['documentId']))
-        names = names + new_names
+        vanilla = story['vanilla']
+        new_persons = get_persons(vanilla)
+        print(str(len(new_persons)) + " persons were found for story=" + str(story['documentId']))
+        persons = persons + new_persons
 
-df = pd.DataFrame([t.__dict__ for t in names])
-df.to_csv("C:/Users/User/Desktop/diploma/ner/result.csv", sep='\t', encoding='utf-8')
-df.groupby(['full']).size().sort_values(ascending=False).head(100).to_csv("C:/Users/User/Desktop/diploma/ner/result2.csv", sep='\t', encoding='utf-8')
+        new_locations = get_locations(vanilla)
+        print(str(len(new_locations)) + " locations were found for story=" + str(story['documentId']))
+        locations = locations + new_locations
+
+
+dfp = pd.DataFrame([t.__dict__ for t in persons])
+dfp.to_csv("C:/Users/User/Desktop/diploma/results/persons_" + d1.strftime('%Y-%m-%d') + "_" + d2.strftime('%Y-%m-%d') + ".csv", sep='\t', encoding='utf-8')
+dfp.groupby(['full']).size().sort_values(ascending=False).to_csv("C:/Users/User/Desktop/diploma/results/top_persons_" + d1.strftime('%Y-%m-%d') + "_" + d2.strftime('%Y-%m-%d') + ".csv", sep='\t', encoding='utf-8')
+
+dfl = pd.DataFrame([t.__dict__ for t in locations])
+dfl.to_csv("C:/Users/User/Desktop/diploma/results/persons_" + d1.strftime('%Y-%m-%d') + "_" + d2.strftime('%Y-%m-%d') + ".csv", sep='\t', encoding='utf-8')
+dfl.groupby(['location']).size().sort_values(ascending=False).to_csv("C:/Users/User/Desktop/diploma/results/top_persons_" + d1.strftime('%Y-%m-%d') + "_" + d2.strftime('%Y-%m-%d') + ".csv", sep='\t', encoding='utf-8')

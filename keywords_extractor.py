@@ -2,7 +2,7 @@ import pandas as pd
 
 import pymorphy2
 from unicodedata import category
-from ner import Keywords
+from ner import Keywords, Name, Location
 from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExtractor)
 
 
@@ -28,26 +28,13 @@ def get_keywords(text):
     return keywords
 
 def get_persons(text):
-    persons = []
-    extractor = NamesExtractor()
-    matches = extractor(text)
-    for name in matches:
-        if not (name.first is not None and name.middle is None, name.last is None, name.nick is None):
-            persons.append(name)
-    return persons
-
-class Name:
-    def __init__(self, f, m, l, n):
-        self.first, self.middle, self.last, self.nick, self.full = f, m, l, n,\
-            (f + " " if f != None else "") + (m + " " if m != None else "") + (l if l != None else "")
-
-def get_names(text):
     extractor = NamesExtractor()
     matches = extractor(text)
     names = []
     for match in matches:
         name = match.fact
-        names.append(Name(name.first, name.middle, name.last, name.nick))
+        if not (name.first is not None and name.middle is None and name.last is None and name.nick is None):
+            names.append(Name(name.first, name.middle, name.last, name.nick))
     return names
 
 text = '''
@@ -70,8 +57,17 @@ text = '''
 Благодарственное письмо   Хочу поблагодарить учителей моего, теперь уже бывшего, одиннадцатиклассника:  Бушуева Вячеслава Владимировича и Бушуеву Веру Константиновну. Они вовлекали сына в интересные внеурочные занятия, связанные с театром и походами.
 '''
 
-# names = get_names(text)
+def get_locations(text):
+    extractor = LocationExtractor()
+    matches = extractor(text)
+    return list(map(lambda m: Location(m.fact.name), matches))
+
+# names = get_persons(text)
 # df = pd.DataFrame([t.__dict__ for t in names])
 # print(df.groupby(['full']).size().sort_values(ascending=False).head(10))
+# df.to_csv("C:/Users/User/Desktop/diploma/ner/result.scv", sep='\t', encoding='utf-8')
+
+# df = pd.DataFrame([t.__dict__ for t in get_locations(text)])
+# print(df.groupby(['location']).size().sort_values(ascending=False).head(10))
 # df.to_csv("C:/Users/User/Desktop/diploma/ner/result.scv", sep='\t', encoding='utf-8')
 
