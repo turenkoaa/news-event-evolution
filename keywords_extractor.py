@@ -27,7 +27,7 @@ def get_keywords(text):
 
     return keywords
 
-def get_persons(text):
+def get_Persons(text):
     extractor = NamesExtractor()
     matches = extractor(text)
     names = []
@@ -37,37 +37,24 @@ def get_persons(text):
             names.append(Name(name.first, name.middle, name.last, name.nick))
     return names
 
-text = '''
-Так говорила в июле 1805 года известная Анна Павловна Шерер, фрейлина и приближенная императрицы Марии Феодоровны, встречая важного и чиновного князя Василия, первого приехавшего на ее вечер. Анна Павловна кашляла несколько дней, у нее был грипп, как она говорила (грипп был тогда новое слово, употреблявшееся только редкими).
 
-Предлагаю вернуть прежние границы природного парка №71 на Инженерной улице 2.
+def get_persons(text):
+    extractor = NamesExtractor()
+    matches = extractor(text)
+    return list(map(lambda name: (name.fact.first + " " if name.fact.first != None else "")
+                         + (name.fact.middle + " " if name.fact.middle != None else "")
+                         + (name.fact.last if name.fact.last != None else ""),
+                    matches))
 
-По адресу Алтуфьевское шоссе д.51 (основной вид разрешенного использования: производственная деятельность, склады) размещен МПЗ. Жители требуют незамедлительной остановки МПЗ и его вывода из района
-
-Контакты О нас телефон 7 881 574-10-02 Адрес Республика Карелия,г.Петрозаводск,ул.Маршала Мерецкова, д.8 Б,офис 4
-
-Благодарственное письмо   Хочу поблагодарить учителей моего, теперь уже бывшего, одиннадцатиклассника:  Бушуева Вячеслава Владимировича и Бушуеву Веру Константиновну. Они вовлекали сына в интересные внеурочные занятия, связанные с театром и походами.
-
-Вячеслава
-
-По адресу Алтуфьевское шоссе д.51 (основной вид разрешенного использования: производственная деятельность, склады) размещен МПЗ. Жители требуют незамедлительной остановки МПЗ и его вывода из района
-
-Контакты О нас телефон 7 881 574-10-02 Адрес Республика Карелия,г.Петрозаводск,ул.Маршала Мерецкова, д.8 Б,офис 4
-
-Благодарственное письмо   Хочу поблагодарить учителей моего, теперь уже бывшего, одиннадцатиклассника:  Бушуева Вячеслава Владимировича и Бушуеву Веру Константиновну. Они вовлекали сына в интересные внеурочные занятия, связанные с театром и походами.
-'''
-
-def get_locations(text):
+def get_Locations(text):
     extractor = LocationExtractor()
     matches = extractor(text)
     return list(map(lambda m: Location(m.fact.name), matches))
 
-# names = get_persons(text)
-# df = pd.DataFrame([t.__dict__ for t in names])
-# print(df.groupby(['full']).size().sort_values(ascending=False).head(10))
-# df.to_csv("C:/Users/User/Desktop/diploma/ner/result.scv", sep='\t', encoding='utf-8')
+def get_locations(text):
+    extractor = LocationExtractor()
+    matches = list(filter(lambda m: m.fact.name != "россия", extractor(text)))
+    return list(map(lambda m: m.fact.name, matches))
 
-# df = pd.DataFrame([t.__dict__ for t in get_locations(text)])
-# print(df.groupby(['location']).size().sort_values(ascending=False).head(10))
-# df.to_csv("C:/Users/User/Desktop/diploma/ner/result.scv", sep='\t', encoding='utf-8')
+
 
