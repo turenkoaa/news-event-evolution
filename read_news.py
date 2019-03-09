@@ -25,7 +25,6 @@ def get_file_for_date(dirname):
 
 def get_spam_clusters(date, threshold):
     trends_path = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/trends/date=" + date + "/")
-    print("processing for spam file: " + trends_path)
     with open(trends_path, encoding="utf8") as trends:
         spam = []
         trends_lines = trends.readlines()
@@ -44,20 +43,19 @@ def get_dates_between(d1, d2):
         dates.append(dt.strftime("%Y-%m-%d"))
     return dates
 
-def filter_news(date):
-    spam = get_spam_clusters(date, 0.5)
-    filepath = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/texts/date=" + date + "/")
-    print("processing file: " + filepath)
-    with open(filepath, encoding="utf8") as f:
-        lines = f.readlines()
-        news = list(map(lambda line: json.loads(line), lines))
-        filtered_news = list(filter(lambda n: filter_doc(n, spam), news))
-        print(str(len(filtered_news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
-        return filtered_news
+# def filter_news(date):
+#     spam = get_spam_clusters(date, 0.5)
+#     filepath = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/texts/date=" + date + "/")
+#     print("processing file: " + filepath)
+#     with open(filepath, encoding="utf8") as f:
+#         lines = f.readlines()
+#         news = list(map(lambda line: json.loads(line), lines))
+#         filtered_news = list(filter(lambda n: filter_doc(n, spam), news))
+#         print(str(len(filtered_news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
+#         return filtered_news
 
-def read_cluster(news, cluster_id):
-    return list(filter(lambda n: n["clusterId"] == cluster_id, news))
-
+# def read_cluster(news, cluster_id):
+#     return list(filter(lambda n: n["clusterId"] == cluster_id, news))
 
 def get_filtered_news_file(date):
     return "C:/Users/User/Desktop/diploma/ner/data/filtered_news_" + date
@@ -66,29 +64,52 @@ def get_preprocessed_data_file(date):
     return "C:/Users/User/Desktop/diploma/ner/preprocessed_data/" + date
 
 
-def write_filtered_news(date):
-    news = filter_news(date)
-    with open(get_filtered_news_file(date), 'w', encoding="utf8") as fp:
-        json.dump(news, fp, ensure_ascii=False)
+# def write_filtered_news(date):
+#     news = filter_news(date)
+#     with open(get_filtered_news_file(date), 'w', encoding="utf8") as fp:
+#         json.dump(news, fp, ensure_ascii=False)
+#
+# def write_preprocessed_data(date):
+#     news = read_filtered_news(date)
+#     with open(get_preprocessed_data_file(date), 'w', encoding="utf8") as fp:
+#         for story in news:
+#             story["persons"] = get_persons(story["vanilla"])
+#             story["locations"] = get_locations(story["vanilla"])
+#         json.dump(news, fp, ensure_ascii=False)
 
-def write_preprocessed_data(date):
-    news = read_filtered_news(date)
+def preprocess_news(date):
+    spam = get_spam_clusters(date, 0.5)
+    filepath = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/texts/date=" + date + "/")
+    print("processing file: " + filepath)
+    with open(filepath, encoding="utf8") as f:
+        lines = f.readlines()
+        news = []
+        for line in lines:
+            story = json.loads(line)
+            if filter_doc(story, spam):
+                story["persons"] = get_persons(story["vanilla"])
+                story["locations"] = get_locations(story["vanilla"])
+            news.append(story)
+        print(str(len(news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
+    return news
+
+
+def write_preprocessed_news(date):
+    news = preprocess_news(date)
     with open(get_preprocessed_data_file(date), 'w', encoding="utf8") as fp:
-        for story in news:
-            story["persons"] = get_persons(story["vanilla"])
-            story["locations"] = get_locations(story["vanilla"])
         json.dump(news, fp, ensure_ascii=False)
 
-def read_filtered_news(date):
-    with open(get_filtered_news_file(date), 'r', encoding="utf8") as fp:
+
+def read_preprocessed_news(date):
+    with open(get_preprocessed_data_file(date), 'r', encoding="utf8") as fp:
         return json.load(fp)
 
 d1 = datetime.date(2018, 10, 10)  # start date
 d2 = datetime.date(2018, 12, 31)  # end date
 dates = get_dates_between(d1, d2)
 
-for d in dates:
-    write_preprocessed_data(d)
+# for d in dates:
+#     write_preprocessed_data(d)
 
 
 # news = read_filtered_news_from_file(d1)

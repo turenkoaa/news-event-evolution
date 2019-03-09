@@ -2,7 +2,7 @@ import datetime
 import pandas as pd
 
 from read_news import get_dates_between
-from similarity import get_cosine_sim
+from similarity import get_cosine_text_sim
 from keywords_extractor import get_keywords, get_Persons, get_locations, get_Locations
 
 d1 = datetime.date(2018, 10, 11)  # start date
