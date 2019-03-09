@@ -3,6 +3,8 @@ import json
 import os
 from langdetect import detect_langs
 
+from keywords_extractor import get_persons, get_locations
+
 
 def is_lang(text, lang, prob): # print(is_lang("Smth", "ru", 0.75))
     try:
@@ -42,7 +44,7 @@ def get_dates_between(d1, d2):
         dates.append(dt.strftime("%Y-%m-%d"))
     return dates
 
-def get_filtered_news(date):
+def filter_news(date):
     spam = get_spam_clusters(date, 0.5)
     filepath = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/texts/date=" + date + "/")
     print("processing file: " + filepath)
@@ -60,20 +62,33 @@ def read_cluster(news, cluster_id):
 def get_filtered_news_file(date):
     return "C:/Users/User/Desktop/diploma/ner/data/filtered_news_" + date
 
+def get_preprocessed_data_file(date):
+    return "C:/Users/User/Desktop/diploma/ner/preprocessed_data/" + date
 
-def write_filtered_news_to_file(date):
-    news = get_filtered_news(date)
+
+def write_filtered_news(date):
+    news = filter_news(date)
     with open(get_filtered_news_file(date), 'w', encoding="utf8") as fp:
         json.dump(news, fp, ensure_ascii=False)
 
+def write_preprocessed_data(date):
+    news = read_filtered_news(date)
+    with open(get_preprocessed_data_file(date), 'w', encoding="utf8") as fp:
+        for story in news:
+            story["persons"] = get_persons(story["vanilla"])
+            story["locations"] = get_locations(story["vanilla"])
+        json.dump(news, fp, ensure_ascii=False)
 
-def read_filtered_news_from_file(date):
+def read_filtered_news(date):
     with open(get_filtered_news_file(date), 'r', encoding="utf8") as fp:
         return json.load(fp)
 
-# d1 = datetime.date(2018, 10, 10)  # start date
-# d2 = datetime.date(2018, 12, 31)  # end date
-# dates = get_dates_between(d1, d2)
+d1 = datetime.date(2018, 10, 10)  # start date
+d2 = datetime.date(2018, 12, 31)  # end date
+dates = get_dates_between(d1, d2)
+
+for d in dates:
+    write_preprocessed_data(d)
 
 
 # news = read_filtered_news_from_file(d1)
