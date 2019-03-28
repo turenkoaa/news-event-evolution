@@ -14,14 +14,17 @@ def is_lang(text, lang, prob): # print(is_lang("Smth", "ru", 0.75))
         print("error in detecting language for text: \"" + text + "\"")
         return False
 
+
 def filter_doc(doc, spam):
     return doc["clusterId"] not in spam and is_lang(doc["vanilla"], "ru", 0.70)
     # return doc["officialGroup"] and doc["clusterId"] not in spam and is_lang(doc["vanilla"], "ru", 0.70)
+
 
 def get_file_for_date(dirname):
     filename = os.listdir(dirname)[0]
     root, ext = os.path.splitext(filename)
     return dirname + filename if ext == '.json' else None
+
 
 def get_spam_clusters(date, threshold):
     trends_path = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/trends/date=" + date + "/")
@@ -35,6 +38,7 @@ def get_spam_clusters(date, threshold):
         print(str(len(spam)) + " spam clusters were found")
         return spam
 
+
 def get_dates_between(d1, d2):
     delta = d2 - d1         # timedelta
     dates = []
@@ -43,39 +47,22 @@ def get_dates_between(d1, d2):
         dates.append(dt.strftime("%Y-%m-%d"))
     return dates
 
-# def filter_news(date):
-#     spam = get_spam_clusters(date, 0.5)
-#     filepath = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/texts/date=" + date + "/")
-#     print("processing file: " + filepath)
-#     with open(filepath, encoding="utf8") as f:
-#         lines = f.readlines()
-#         news = list(map(lambda line: json.loads(line), lines))
-#         filtered_news = list(filter(lambda n: filter_doc(n, spam), news))
-#         print(str(len(filtered_news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
-#         return filtered_news
 
-# def read_cluster(news, cluster_id):
-#     return list(filter(lambda n: n["clusterId"] == cluster_id, news))
+def read_cluster(news, cluster_id):
+    return list(filter(lambda n: n["clusterId"] == cluster_id, news))
+
 
 def get_filtered_news_file(date):
     return "C:/Users/User/Desktop/diploma/ner/data/filtered_news_" + date
+
 
 def get_preprocessed_data_file(date):
     return "C:/Users/User/Desktop/diploma/ner/preprocessed_data/" + date
 
 
-# def write_filtered_news(date):
-#     news = filter_news(date)
-#     with open(get_filtered_news_file(date), 'w', encoding="utf8") as fp:
-#         json.dump(news, fp, ensure_ascii=False)
-#
-# def write_preprocessed_data(date):
-#     news = read_filtered_news(date)
-#     with open(get_preprocessed_data_file(date), 'w', encoding="utf8") as fp:
-#         for story in news:
-#             story["persons"] = get_persons(story["vanilla"])
-#             story["locations"] = get_locations(story["vanilla"])
-#         json.dump(news, fp, ensure_ascii=False)
+def get_preprocessed_officialGroup_data_file(date):
+    return "C:/Users/User/Desktop/diploma/ner/officialGroup/" + date
+
 
 def preprocess_news(date):
     spam = get_spam_clusters(date, 0.5)
@@ -87,12 +74,12 @@ def preprocess_news(date):
         for line in lines:
             story = json.loads(line)
             if filter_doc(story, spam):
+                story["date"] = date
                 story["persons"] = get_persons(story["vanilla"])
                 story["locations"] = get_locations(story["vanilla"])
-            news.append(story)
+                news.append(story)
         print(str(len(news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
     return news
-
 
 def write_preprocessed_news(date):
     news = preprocess_news(date)
@@ -101,24 +88,21 @@ def write_preprocessed_news(date):
 
 
 def read_preprocessed_news(date):
-    with open(get_preprocessed_data_file(date), 'r', encoding="utf8") as fp:
+    with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
         return json.load(fp)
+
+def read_preprocessed_news_for_dates(dates):
+    result = []
+    for date in dates:
+        with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
+            result = result + json.load(fp)
+    return result
+
 
 d1 = datetime.date(2018, 10, 10)  # start date
 d2 = datetime.date(2018, 12, 31)  # end date
 dates = get_dates_between(d1, d2)
 
-# for d in dates:
-#     write_preprocessed_data(d)
-
-
-# news = read_filtered_news_from_file(d1)
-# for i in range(1,5):
-#     cluster = read_cluster(news, i)
-#     for doc in cluster:
-#         print(doc["vanilla"])
-#         print("// cluster_id=" + str(doc["clusterId"]))
-#     print("____________________________________________________________")
 
 
 
