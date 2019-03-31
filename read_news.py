@@ -1,6 +1,8 @@
 import datetime
 import json
 import os
+import re
+
 from langdetect import detect_langs
 
 from keywords_extractor import get_persons, get_locations
@@ -64,6 +66,14 @@ def get_preprocessed_officialGroup_data_file(date):
     return "C:/Users/User/Desktop/diploma/ner/officialGroup/" + date
 
 
+def extract_nornalized_texts(news):
+    for story in news:
+        result = ""
+        for token in story["text"]:
+            if not re.match(r".* +.*", token):
+                result = result + " " + token
+        story['normalized_text'] = result
+
 def preprocess_news(date):
     spam = get_spam_clusters(date, 0.5)
     filepath = get_file_for_date("C:/Users/User/Desktop/diploma/datasets/outerTrendsDataset/texts/date=" + date + "/")
@@ -81,6 +91,7 @@ def preprocess_news(date):
         print(str(len(news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
     return news
 
+
 def write_preprocessed_news(date):
     news = preprocess_news(date)
     with open(get_preprocessed_data_file(date), 'w', encoding="utf8") as fp:
@@ -89,13 +100,15 @@ def write_preprocessed_news(date):
 
 def read_preprocessed_news(date):
     with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
-        return json.load(fp)
+        news = json.load(fp)
+        extract_nornalized_texts(news)  # todo part of preprocessing!
+        return news
+
 
 def read_preprocessed_news_for_dates(dates):
     result = []
     for date in dates:
-        with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
-            result = result + json.load(fp)
+        result = read_preprocessed_news(date)
     return result
 
 

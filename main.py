@@ -1,60 +1,48 @@
-import datetime
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-from print_results import print_number_of_news_clusters_and_texts, print_story_clustering_per_day
-from read_news import get_dates_between, read_preprocessed_news, read_cluster, read_preprocessed_news_for_dates
-
-
-import scipy.stats as st
+from read_news import get_dates_between, read_preprocessed_news_for_dates
 from pylab import *
+from story_clustering import calculate_events_data
+from visualization import draw_graph
 
-d1 = datetime.date(2018, 10, 10)  # start date
-d2 = datetime.date(2018, 10, 17)  # end date
+d1 = datetime.date(2018, 10, 16)  # start date
+d2 = datetime.date(2018, 10, 20)  # end date
 dates = get_dates_between(d1, d2)
+w = [0.7, 0.15, 0.15]
+t = 0.1
 
-for date in dates:
-    news = read_preprocessed_news(date)
-    print_story_clustering_per_day(news)
+news = read_preprocessed_news_for_dates(dates)
+events_data = calculate_events_data(news, w, t)
 
+threshold = 0.2
+events_sim = cosine_similarity(events_data['event_term_vectors'])
 
+for i in range(len(events_sim)):
+    for j in range(0, i + 1):
+        events_sim[i][j] = 0
 
-# print(get_cosine_text_sim(news))
+result = np.argwhere(events_sim > threshold)
+print(result)
 
-# feature_names = tfidf.get_feature_names()
-# corpus_index = [n for n in corpus]
-# rows, cols = tfs.nonzero()
-# for row, col in zip(rows, cols):
-#     print((feature_names[col], corpus_index[row]), tfs[row, col])
+idx = 0
+for event in enumerate(events_data['events']):
+    print(">>>> " + str(idx))
+    print(news[event[0]]['vanilla'])
+    idx = idx + 1
 
-# alpha = 1
-# time_delta = len(dates)
-# news = read_preprocessed_news_for_dates(dates)
-#
-# for i in range(0, len(news)):
-#     for j in range(i + 1, len(news)):
-#         print(news[i]["date"] + "/" + news[j]["date"] + ": " + str(time_decay(alpha, news[i], news[j], time_delta)))
-
-# news = read_preprocessed_news(d1.strftime('%Y-%m-%d'))
-# texts_count = len(news)
-# w1, w2 = 0.9, 0.1
-# alpha = 0
-# time_delta = len(dates)
-# matrix = nallapati_sim(news, [w1, w2/2, w2/2], alpha, time_delta)
-
-# for i in range(0, texts_count):
-#     for j in range(i + 1, texts_count):
-#         if news[i]["clusterId"] == news[j]["clusterId"]:
-#             print(matrix[i][j])
-#             print(str(news[i]["documentId"]) + ": " + news[i]["vanilla"][0:150])
-#             print(str(news[j]["documentId"]) + ": " + news[j]["vanilla"][0:150])
-#             print("\n")
+draw_graph(result.T[0], result.T[1])
 
 
+# for pair in result:
+#     for storyNum in events_data['events'][pair[0]]:
+#         print(news[storyNum]['vanilla'])
+#         print("_ _ _ _ _ _ _ _ _ _ _ _")
+#     print("_______________________")
+#     for storyNum in events_data['events'][pair[1]]:
+#         print(news[storyNum]['vanilla'])
+#         print("_ _ _ _ _ _ _ _ _ _ _ _")
+#     print(news[pair[1]]['vanilla'])
+#     print("_______________________")
+#     print("_______________________")
 
-# for i in range(1,5):
-#     cluster = read_cluster(news, i)
-#     for doc in cluster:
-#         print(doc["vanilla"])
-#         print("// cluster_id=" + str(doc["clusterId"]))
-#     print("____________________________________________________________")
+

@@ -1,31 +1,28 @@
-import re
 import numpy as np
 from datetime import datetime
 from math import exp
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from read_news import get_dates_between
+from normalize_word import get_tf_idf
 
 
 def cosine_sim(text):
-    vectors = get_vectors(text) # get_tf_idf_vectors(text)
+    vectors = get_tf_idf(text, True) # get_tf_idf_vectors(text)
     return cosine_similarity(vectors)
 
 
-def get_vectors(text):
-    vectorizer = CountVectorizer(text)
-    vectorizer.fit(text)
-    return vectorizer.transform(text).toarray()
+def get_event_term_vectors(events, story_vectors):
+    vocabulary_len = len(story_vectors[0])
 
-def get_tf_idf_vectors(texts, use_idf = True):
-    tfidf = TfidfVectorizer(use_idf=use_idf, analyzer='word', ngram_range=(1, 2),
-                            min_df=0, sublinear_tf=True)
+    event_term_vectors = np.empty((0, vocabulary_len), np.float64)
+    for key, docs in events.items():
+        v = np.array(np.zeros(vocabulary_len))
+        for doc in docs:
+            v = v + np.array(story_vectors[doc])
+        v = v / len(docs)
 
-    tfidf_matrix = tfidf.fit_transform(texts)
-    # if print:
-    #     df = pd.DataFrame(tfidf_matrix.toarray(), columns=tfidf.get_feature_names())
-    #     print(df)
-    return tfidf_matrix
+        event_term_vectors = np.append(event_term_vectors, np.array([v]), axis=0)
+    return event_term_vectors
 
 
 def jaccard_sim(words1, words2):
@@ -46,24 +43,11 @@ def get_jaccard_entities_sim(entities):
             matrix[i][j] = sim
             matrix[j][i] = sim
 
-            # if matrix[i][j] > 0.7:
-            #     print("locs 1: " + str(locations[i]))
-            #     print("locs 2: " + str(locations[j]))
-
     return matrix
 
 
 def get_cosine_text_sim(news):
-    docs = list(map(lambda doc: doc["text"], news))
-    texts = []
-
-    for doc in docs:
-        result = ""
-        for token in doc:
-            if not re.match(r".* +.*", token):
-                result = result + " " + token
-        texts.append(result)
-
+    texts = list(map(lambda doc: doc["vanilla"], news))  # list(map(lambda doc: doc["normalized_text"], news))
     return cosine_sim(texts)
 
 

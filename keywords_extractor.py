@@ -2,12 +2,39 @@ import pandas as pd
 
 import pymorphy2
 from unicodedata import category
-from ner import Keywords, Name, Location
 from natasha import (NamesExtractor, DatesExtractor, MoneyExtractor, LocationExtractor)
+import string
+
+
+class TextFeatures:
+    def __init__(self, id):
+        self.id = id
+        self.persons = []
+
+
+class Keywords:
+    def __init__(self):
+        self.verbs = []
+        self.nouns = []
+        self.adjs = []
+
+
+class Name:
+    def __init__(self, f, m, l, n):
+        self.first, self.middle, self.last, self.nick, self.full = f, m, l, n, \
+                                                                   (f + " " if f != None else "") + (
+                                                                       m + " " if m != None else "") + (
+                                                                       l if l != None else "")
+
+
+class Location:
+    def __init__(self, n):
+        self.location = n
 
 
 def exclude_punctuation(string):
     return ''.join(ch for ch in string if category(ch)[0] != 'P')
+
 
 def get_keywords(text):
     morph = pymorphy2.MorphAnalyzer()
@@ -26,6 +53,7 @@ def get_keywords(text):
                 keywords.adjs.append((exclude_punctuation(option.word), option.score))
 
     return keywords
+
 
 def get_Persons(text):
     extractor = NamesExtractor()
@@ -46,10 +74,12 @@ def get_persons(text):
                          + (name.fact.last if name.fact.last != None else ""),
                     matches))
 
+
 def get_Locations(text):
     extractor = LocationExtractor()
     matches = extractor(text)
     return list(map(lambda m: Location(m.fact.name), matches))
+
 
 def get_locations(text):
     extractor = LocationExtractor()
