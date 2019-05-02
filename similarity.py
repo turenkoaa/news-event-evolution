@@ -7,22 +7,8 @@ from normalize_word import get_tf_idf
 
 
 def cosine_sim(text):
-    vectors = get_tf_idf(text, True) # get_tf_idf_vectors(text)
+    vectors = get_tf_idf(text, True)
     return cosine_similarity(vectors)
-
-
-def get_event_term_vectors(events, story_vectors):
-    vocabulary_len = len(story_vectors[0])
-
-    event_term_vectors = np.empty((0, vocabulary_len), np.float64)
-    for key, docs in events.items():
-        v = np.array(np.zeros(vocabulary_len))
-        for doc in docs:
-            v = v + np.array(story_vectors[doc])
-        v = v / len(docs)
-
-        event_term_vectors = np.append(event_term_vectors, np.array([v]), axis=0)
-    return event_term_vectors
 
 
 def jaccard_sim(words1, words2):
@@ -61,6 +47,16 @@ def get_jaccard_persons_sim(news):
     return get_jaccard_entities_sim(persons)
 
 
+def get_jaccard_locations_sim(news):
+    locations = list(map(lambda s: set(s["locations"]), news))  # news -> [[locations]]
+    return get_jaccard_entities_sim(locations)
+
+
+def get_jaccard_persons_and_locations_sim(news):
+    persons_and_locations = list(map(lambda s: set(s["persons"] + s["locations"]), news))  # news -> [[persons]]
+    return get_jaccard_entities_sim(persons_and_locations)
+
+
 def get_cosine_locations_sim(news):
     locations = list(map(lambda story: "" + ' '.join(story["locations"]), news))
     return cosine_sim(locations)
@@ -90,3 +86,6 @@ def get_time_decay(alpha, news, time_delta):
 
 def nallapati_sim(news, w, alpha, time_delta):
     return (w[0] * get_cosine_text_sim(news) + w[1] * get_jaccard_locations_sim(news) + w[2] * get_jaccard_persons_sim(news)) # * get_time_decay(alpha, news, time_delta)
+
+def fresh_look_sim(news, alpha, time_delta):
+    return get_cosine_text_sim(news) * get_jaccard_persons_and_locations_sim(news) # * get_time_decay(alpha, news, time_delta)

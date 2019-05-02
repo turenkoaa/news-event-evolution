@@ -28,7 +28,7 @@ def print_story_clustering_per_day(news, date):
     w = [0.7, 0.15, 0.15]
     t = 0.1
 
-    max_events_number = len(set(map(lambda n: n["clusterId"], news))) * 2
+    max_events_number = len(set(map(lambda n: n["clusterId"], news))) * 1.5
     sim = nallapati_sim(news, w, 1, 1)  # get_cosine_text_sim(news)
     events = story_clustering_to_events(sim, t, max_events_number)
     f = open("C:/Users/User/Desktop/diploma/ner/results/story_clustering/lemms/" + date + ".txt", "w+", encoding="utf8")

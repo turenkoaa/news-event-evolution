@@ -108,7 +108,7 @@ def read_preprocessed_news(date):
 def read_preprocessed_news_for_dates(dates):
     result = []
     for date in dates:
-        result = read_preprocessed_news(date)
+        result = result + read_preprocessed_news(date)
     return result
 
 
