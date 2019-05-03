@@ -11,10 +11,14 @@ from stop_words import get_stop_words
 url_regexp = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})'
 
 
-def prepocess_string(string):
+def prepocess_string(text):
+    text = re.sub('[^а-яА-я]', ' ', text)
+    text = text.lower()
+    text = re.sub("&lt;/?.*?&gt;", " &lt;&gt; ", text)
+    text = re.sub("(\\d|\\W)+", " ", text)
     res = ""
     morph = pymorphy2.MorphAnalyzer()
-    for word in string.split():
+    for word in text.split():
         if not re.match(url_regexp, word):
             res = res + " " + morph.parse(word)[0].normalized.normal_form
     return res

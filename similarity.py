@@ -87,5 +87,6 @@ def get_time_decay(alpha, news, time_delta):
 def nallapati_sim(news, w, alpha, time_delta):
     return (w[0] * get_cosine_text_sim(news) + w[1] * get_jaccard_locations_sim(news) + w[2] * get_jaccard_persons_sim(news)) # * get_time_decay(alpha, news, time_delta)
 
+
 def fresh_look_sim(news, alpha, time_delta):
     return get_cosine_text_sim(news) * get_jaccard_persons_and_locations_sim(news) # * get_time_decay(alpha, news, time_delta)

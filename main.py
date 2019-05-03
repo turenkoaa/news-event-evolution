@@ -27,7 +27,7 @@ result = np.argwhere(events_sim > threshold)
 events = events_data['events']
 for key in events:
     print(">>>> " + str(key))
-    for doc in events[key]:
+    for doc in events[key]['news']:
         print(news[doc]['vanilla'])
         print('_________________')
 

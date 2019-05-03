@@ -109,12 +109,15 @@ def read_preprocessed_news_for_dates(dates):
     result = []
     for date in dates:
         result = result + read_preprocessed_news(date)
+
+    for i, story in enumerate(result):
+        result[i]['index'] = i
     return result
 
 
-d1 = datetime.date(2018, 10, 10)  # start date
-d2 = datetime.date(2018, 12, 31)  # end date
-dates = get_dates_between(d1, d2)
+# d1 = datetime.date(2018, 10, 10)  # start date
+# d2 = datetime.date(2018, 12, 31)  # end date
+# dates = get_dates_between(d1, d2)
 
 
 

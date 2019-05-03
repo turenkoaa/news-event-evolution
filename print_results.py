@@ -36,7 +36,7 @@ def print_story_clustering_per_day(news, date):
 
     for id, docs in events.items():
         f.write("event: " + str(id) + "\n")
-        for doc in docs:
+        for doc in docs['news']:
             f.write("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _" + "\n")
             f.write(news[doc]['vanilla'] + "\n")
 

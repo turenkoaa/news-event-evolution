@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from normalize_word import get_tf_idf
 from read_news import read_preprocessed_news_for_dates, get_dates_between
 from similarity import nallapati_sim, fresh_look_sim
-from story_clustering import get_event_term_vectors, create_events_graph
+from story_clustering import get_event_term_vectors, create_events_graph, get_min_date
 from visualization import draw_graph
 
 d1 = datetime.date(2018, 10, 10)  # start date
@@ -50,36 +50,30 @@ pos = nx.spring_layout(G)
 count = 0
 events = {}
 
-for i, story in enumerate(news):
-    news[i]['index'] = i
-
-
 for com in set(partition.values()):
     count = count + 1
     list_nodes = [nodes for nodes in partition.keys()
                                 if partition[nodes] == com]
     nx.draw_networkx_nodes(G, pos, list_nodes, labels=labels, node_size=20,
                                 node_color=str(count / size))
-    print("____________________________________________________________________")
-    print(">>> Event " + str(com) + ": ")
-    events[count] = []
 
+    events[count - 1] = {'news': []}
     for node in list_nodes:
-        print("documentId = " + str(node) + ":" + "(" + news[node]["date"] + ")")
-        print(news[node]['vanilla'])
-        events[count].append(news[node]['index'])
+        events[count - 1]['news'].append(news[node]['index'])
+
+    events[count - 1]['start_time'] = get_min_date(news, events[count - 1]['news'])
 
 
 threshold = 0.3
 
+for key in events:
+    print(">>>> " + str(key))
+    for doc in events[key]['news']:
+        print("documentId = " + str(news[doc]['documentId']) + ":" + "(" + news[doc]["date"] + ")")
+        print(news[doc]['vanilla'])
+    print('_________________')
+
 result = create_events_graph(threshold, news, events)
-# for key in events:
-#     print(">>>> " + str(key))
-#     for doc in events[key]:
-#         print(news[doc]['vanilla'])
-#         print('_________________')
-
-
 draw_graph(result[0], result[1])
 #
 #
