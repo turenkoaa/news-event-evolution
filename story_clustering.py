@@ -38,22 +38,9 @@ def story_clustering_to_events(sim_matrix, t, max_events_number):  # 100 mb, 13%
     return events
 
 
-def get_event_term_vectors(events, story_vectors):
-    vocabulary_len = len(story_vectors[0])
-
-    event_term_vectors = np.empty((0, vocabulary_len), np.float64)
-    for key, event in events.items():
-        v = np.array(np.zeros(vocabulary_len))
-        for doc in event:
-            v = v + np.array(story_vectors[doc])
-        v = v / len(event)
-
-        event_term_vectors = np.append(event_term_vectors, np.array([v]), axis=0)
-
-    return event_term_vectors
-
-
-def get_event_term_vectors1(events, story_vectors):
+def get_event_term_vectors1(events, news):
+    story_vectors = get_tf_idf(list(map(lambda doc: doc["vanilla"], news)), False)
+        # get_vectors(list(map(lambda doc: doc["normalized_text"], news)))  # todo use cache
     vocabulary_len = len(story_vectors[0])
 
     event_term_vectors = np.empty((0, vocabulary_len), np.float64)
@@ -73,11 +60,9 @@ def calculate_events_data(news, w, t):
     events = calculate_events_clusters(news, w, t)
 
     print("Start computation of event term vectors...")
-    story_vectors = get_tf_idf(list(map(lambda doc: doc["vanilla"], news)), False)  # get_vectors(list(map(lambda doc: doc["normalized_text"], news)))  # todo use cache
-
     events_data['news'] = news
     events_data['events'] = events
-    events_data['event_term_vectors'] = get_event_term_vectors(events, story_vectors)
+    events_data['event_term_vectors'] = get_event_term_vectors1(events, news)
 
     return events_data
 
@@ -96,9 +81,8 @@ def get_min_date(news, docs):
     return min(dates)
 
 
-def create_events_graph(threshold, news, events):
-    story_vectors = get_tf_idf(list(map(lambda doc: doc["vanilla"], news)), False)
-    event_term_vectors = get_event_term_vectors1(events, story_vectors)
+def calculate_events_similarity(events, news):
+    event_term_vectors = get_event_term_vectors1(events, news)
     events_sim = cosine_similarity(event_term_vectors)
 
     for i in range(len(events_sim)):
@@ -106,6 +90,10 @@ def create_events_graph(threshold, news, events):
             if i == j or events[i]['start_time'] >= events[j]['start_time']:
                 events_sim[i][j] = 0
 
+    return events_sim
+
+
+def create_events_graph(threshold, events_sim):
     result = np.argwhere(events_sim > threshold)
     return result.T
 
@@ -115,11 +103,23 @@ def enrich_events_with_date(events, news):
         events[key]['start_time'] = get_min_date(news, events[key]['news'])
 
 
-def enrich_events_with_keywords(events, news):
+def enrich_events_with_keywords_union(events, news):
     for key in events:
-        list = []
+        keys = []
         for doc in events[key]['news']:
-            for k in news[doc]['keywords']:
-                list.append(k)
+            keys = keys + list(news[doc]['keywords'])
+            keys = keys + news[doc]['persons']
+            keys = keys + news[doc]['locations']
 
-        events[key]['keywords'] = set(list)
+        events[key]['keywords'] = set(keys)
+
+
+def enrich_events_with_keywords_intersection(events, news):
+    for key in events:
+        keys = news[events[key]['news'][0]]['keywords']
+        for doc in events[key]['news']:
+            keys = set.intersection(set(news[doc]['keywords']), keys)
+            keys = set.intersection(set(news[doc]['persons']), keys)
+            keys = set.intersection(set(news[doc]['locations']), keys)
+
+        events[key]['keywords'] = keys
