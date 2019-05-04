@@ -20,6 +20,25 @@ def draw_graph(fromV, toV):
         plt.show()
 
 
+def draw_graph3(fromV, toV):
+
+    df = pd.DataFrame({'from': fromV, 'to': toV})
+
+    # Build your graph
+    G = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.DiGraph())
+    pos = nx.spring_layout(G)
+    graphs = list(nx.weakly_connected_component_subgraphs(G))
+    print("Number of Stories: " + str(len(graphs)))
+
+    # for g in graphs:
+        # pos = nx.spring_layout(g)
+
+    # Plot it
+    nx.draw(G, pos, with_labels=True)
+    plt.show()
+
+
+
 def draw_graph2(fromV, toV):
     df = pd.DataFrame({'from': fromV, 'to': toV})
     G = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.DiGraph())

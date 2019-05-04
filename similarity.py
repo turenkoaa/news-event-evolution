@@ -33,7 +33,7 @@ def get_jaccard_entities_sim(entities):
 
 
 def get_cosine_text_sim(news):
-    texts = list(map(lambda doc: doc["vanilla"], news))  # list(map(lambda doc: doc["normalized_text"], news))
+    texts = list(map(lambda doc: doc["vanilla"], news))  # list(map(lambda doc: doc["normalized"], news))
     return cosine_sim(texts)
 
 
@@ -49,6 +49,11 @@ def get_jaccard_persons_sim(news):
 
 def get_jaccard_persons_and_locations_sim(news):
     persons_and_locations = list(map(lambda s: set(s["persons"] + s["locations"]), news))  # news -> [[persons]]
+    return get_jaccard_entities_sim(persons_and_locations)
+
+
+def get_jaccard_keywords_sim(news):
+    persons_and_locations = list(map(lambda s: set(s['keywords']), news))  # news -> [[persons]]
     return get_jaccard_entities_sim(persons_and_locations)
 
 
@@ -86,6 +91,9 @@ def nallapati_sim(news, w, alpha, time_delta):
 def fresh_look_sim(news, alpha, time_delta):
     return get_cosine_text_sim(news) * get_jaccard_persons_and_locations_sim(news) # * get_time_decay(alpha, news, time_delta)
 
+
+def text_and_keywords_sim(news, alpha, time_delta):
+    return get_cosine_text_sim(news) * get_jaccard_keywords_sim(news) # * get_time_decay(alpha, news, time_delta)
 
 # def use_date_for_sim(sim, news):
 #     for i in range(len(sim)):

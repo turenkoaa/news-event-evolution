@@ -1,8 +1,9 @@
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from similarity import nallapati_sim, get_tf_idf
-from normalize_word import get_vectors
+from normalize_word import get_vectors, prepocess_string
 
 
 def story_clustering_to_events(sim_matrix, t, max_events_number):  # 100 mb, 13% cpu, 534 story - 40 sec
@@ -40,7 +41,7 @@ def story_clustering_to_events(sim_matrix, t, max_events_number):  # 100 mb, 13%
 
 def get_event_term_vectors1(events, news):
     story_vectors = get_tf_idf(list(map(lambda doc: doc["vanilla"], news)), False)
-        # get_vectors(list(map(lambda doc: doc["normalized_text"], news)))  # todo use cache
+        # get_vectors(list(map(lambda doc: doc["normalized"], news)))  # todo use cache
     vocabulary_len = len(story_vectors[0])
 
     event_term_vectors = np.empty((0, vocabulary_len), np.float64)
@@ -123,3 +124,36 @@ def enrich_events_with_keywords_intersection(events, news):
             keys = set.intersection(set(news[doc]['locations']), keys)
 
         events[key]['keywords'] = keys
+
+
+def enrich_events_with_keywords_intersection_with_param(events, news, threshold):
+    for key in events:
+        events[key]['keywords'] = []
+        keys = []
+        for doc in events[key]['news']:
+            keys = keys + list(news[doc]['keywords'])
+            keys = keys + news[doc]['persons']
+            keys = keys + news[doc]['locations']
+
+        amount = len(events[key]['news'])
+        for keyword in set(keys):
+            count = 0
+            for doc in events[key]['news']:
+                if keyword in list(news[doc]['keywords']) + news[doc]['persons'] + news[doc]['locations']:
+                    count = count + 1
+            if float(count) / amount > threshold:
+                events[key]['keywords'].append(keyword)
+
+
+def enrich_events_with_top_n_keywords(events, news, n):
+    for key in events:
+        corpus = list(map(lambda i: prepocess_string(news[i]['vanilla']), events[key]['news']))
+        vec = CountVectorizer().fit(corpus)
+        bag_of_words = vec.transform(corpus)
+        sum_words = bag_of_words.sum(axis=0)
+        words_freq = [(word, sum_words[0, idx]) for word, idx in
+                      vec.vocabulary_.items()]
+        words_freq = sorted(words_freq, key=lambda x: x[1],
+                            reverse=True)
+        events[key]['keywords'] = words_freq[:n]
+

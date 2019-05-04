@@ -4,6 +4,7 @@ from pprint import pprint
 import pandas as pd
 
 import pymorphy2
+from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from stop_words import get_stop_words
 
@@ -19,8 +20,8 @@ def prepocess_string(text):
     res = ""
     morph = pymorphy2.MorphAnalyzer()
     for word in text.split():
-        if not re.match(url_regexp, word):
-            res = res + " " + morph.parse(word)[0].normalized.normal_form
+        if not re.match(url_regexp, word) and not word in stopwords.words('russian') + ['это', 'poccия', 'украина', 'либо', 'когда', 'также', 'рф']:
+            res = res + " " + morph.parse(word)[0].normalized.normal_form.strip()
     return res
 
 
