@@ -47,7 +47,7 @@ def calculate_event_similarity_by_keywords_Jaccard(events):
 
 
 d1 = datetime.date(2018, 10, 10)  # start date
-d2 = datetime.date(2018, 10, 16)  # end date
+d2 = datetime.date(2018, 10, 10)  # end date
 dates = get_dates_between(d1, d2)
 w = [0.7, 0.15, 0.15]
 t = 0.2 # 0.1

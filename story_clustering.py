@@ -3,7 +3,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from similarity import nallapati_sim, get_tf_idf
-from normalize_word import get_vectors, prepocess_string
 
 
 def story_clustering_to_events(sim_matrix, t, max_events_number):  # 100 mb, 13% cpu, 534 story - 40 sec
@@ -40,7 +39,7 @@ def story_clustering_to_events(sim_matrix, t, max_events_number):  # 100 mb, 13%
 
 
 def get_event_term_vectors1(events, news):
-    story_vectors = get_tf_idf(list(map(lambda doc: doc["vanilla"], news)), False)
+    story_vectors = get_tf_idf(list(map(lambda doc: doc["normalized"], news)), False)
         # get_vectors(list(map(lambda doc: doc["normalized"], news)))  # todo use cache
     vocabulary_len = len(story_vectors[0])
 
@@ -147,7 +146,7 @@ def enrich_events_with_keywords_intersection_with_param(events, news, threshold)
 
 def enrich_events_with_top_n_keywords(events, news, n):
     for key in events:
-        corpus = list(map(lambda i: prepocess_string(news[i]['vanilla']), events[key]['news']))
+        corpus = list(map(lambda i: news[i]["normalized"], events[key]['news']))
         vec = CountVectorizer().fit(corpus)
         bag_of_words = vec.transform(corpus)
         sum_words = bag_of_words.sum(axis=0)

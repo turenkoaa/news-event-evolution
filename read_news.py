@@ -5,7 +5,9 @@ import re
 
 from langdetect import detect_langs
 
+from keywords_based.keywords_from_news import extract_keywords_from_news, extract_keywords_from_story_ranktext
 from keywords_extractor import get_persons, get_locations
+from normalize_word import prepocess_string
 
 
 def is_lang(text, lang, prob): # print(is_lang("Smth", "ru", 0.75))
@@ -63,16 +65,14 @@ def get_preprocessed_data_file(date):
 
 
 def get_preprocessed_officialGroup_data_file(date):
-    return "C:/Users/User/Desktop/diploma/ner/officialGroup/" + date
+    return "C:/Users/User/Desktop/diploma/ner/preprocessed_official_group/" + date
 
 
 def extract_nornalized_texts(news):
     for story in news:
-        result = ""
-        for token in story["text"]:
-            if not re.match(r".* +.*", token):
-                result = result + " " + token
-        story['normalized_text'] = result
+        story['normalized'] = prepocess_string(story['vanilla'])
+        extract_keywords_from_story_ranktext(story)
+
 
 def preprocess_news(date):
     spam = get_spam_clusters(date, 0.5)
@@ -87,21 +87,17 @@ def preprocess_news(date):
                 story["date"] = date
                 story["persons"] = get_persons(story["vanilla"])
                 story["locations"] = get_locations(story["vanilla"])
+                story['normalized'] = prepocess_string(story['vanilla'])
+                extract_keywords_from_story_ranktext(story)
                 news.append(story)
+
         print(str(len(news)) + "/" + str(len(lines)) + " filtered news were found for date=" + date)
     return news
-
-
-def write_preprocessed_news(date):
-    news = preprocess_news(date)
-    with open(get_preprocessed_data_file(date), 'w', encoding="utf8") as fp:
-        json.dump(news, fp, ensure_ascii=False)
 
 
 def read_preprocessed_news(date):
     with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
         news = json.load(fp)
-        extract_nornalized_texts(news)  # todo part of preprocessing!
         return news
 
 
@@ -115,9 +111,20 @@ def read_preprocessed_news_for_dates(dates):
     return result
 
 
-# d1 = datetime.date(2018, 10, 10)  # start date
-# d2 = datetime.date(2018, 12, 31)  # end date
+def write_preprocessed_news(date):
+    news = read_preprocessed_news(date)
+    for story in news:
+        story['normalized'] = prepocess_string(story['vanilla'])
+        extract_keywords_from_story_ranktext(story)
+    with open("C:/Users/User/Desktop/diploma/ner/preprocessed_official_group/" + date, 'w', encoding="utf8") as fp:
+        json.dump(news, fp, ensure_ascii=False)
+
+
+# d1 = datetime.date(2018, 10, 10)
+# d2 = datetime.date(2018, 12, 31)
 # dates = get_dates_between(d1, d2)
+# for date in dates:
+#     write_preprocessed_news(date)
 
 
 

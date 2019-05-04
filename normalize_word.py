@@ -20,13 +20,13 @@ def prepocess_string(text):
     res = ""
     morph = pymorphy2.MorphAnalyzer()
     for word in text.split():
-        if not re.match(url_regexp, word) and not word in stopwords.words('russian') + ['это', 'poccия', 'украина', 'либо', 'когда', 'также', 'рф']:
+        if not re.match(url_regexp, word) and not word in stopwords.words('russian') \
+                                                  + ['это', 'poccия', 'украина', 'либо', 'когда', 'также', 'рф', 'который']:
             res = res + " " + morph.parse(word)[0].normalized.normal_form.strip()
     return res
 
 
 def get_tf_idf(texts, use_idf):
-    texts = list(map(lambda t: prepocess_string(t), texts))
     ru_stop_words = get_stop_words('russian')
     vectorizer = TfidfVectorizer(use_idf=use_idf,
                         stop_words=ru_stop_words,

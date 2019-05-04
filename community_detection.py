@@ -2,13 +2,10 @@ import datetime
 
 import community
 import networkx as nx
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
-from normalize_word import get_tf_idf
 from read_news import read_preprocessed_news_for_dates, get_dates_between
-from similarity import nallapati_sim, fresh_look_sim
+from similarity import fresh_look_sim
 from story_clustering import create_events_graph, get_min_date, calculate_events_similarity, enrich_events_with_date
 from visualization import draw_graph
 
@@ -19,14 +16,14 @@ w = [0.7, 0.15, 0.15]
 t = 0.2
 
 news = read_preprocessed_news_for_dates(dates)
-sim = nallapati_sim(news, w, 1, 1)
+sim = fresh_look_sim(news, 1, 1)
 
 
 for i in range(len(sim)):
     for j in range(0, i + 1):
         sim[i][j] = 0
 
-result = np.argwhere(sim > 0)
+result = np.argwhere(sim > t)
 
 weighted_edges = [(edge[0], edge[1], dict(weight=sim[edge[0]][edge[1]])) for edge in result]
 

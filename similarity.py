@@ -33,7 +33,7 @@ def get_jaccard_entities_sim(entities):
 
 
 def get_cosine_text_sim(news):
-    texts = list(map(lambda doc: doc["vanilla"], news))  # list(map(lambda doc: doc["normalized"], news))
+    texts = list(map(lambda doc: doc["normalized"], news))  # list(map(lambda doc: doc["normalized"], news))
     return cosine_sim(texts)
 
 
