@@ -76,6 +76,13 @@ def calculate_events_clusters(news, w, t):
     return events
 
 
+def story_to_event_mapping(sim_matrix):  # 100 mb, 13% cpu, 534 story - 40 sec
+    events = {}
+    for i in range(len(sim_matrix)):
+        events[i] = {'news': [i]}
+    return events
+
+
 def get_min_date(news, docs):
     dates = list(map(lambda i: news[i]['documentId'], docs))
     return min(dates)
