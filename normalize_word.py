@@ -20,9 +20,10 @@ def prepocess_string(text):
     res = ""
     morph = pymorphy2.MorphAnalyzer()
     for word in text.split():
-        if not re.match(url_regexp, word) and not word in stopwords.words('russian') \
-                                                  + ['это', 'poccия', 'украина', 'либо', 'когда', 'также', 'рф', 'который']:
-            res = res + " " + morph.parse(word)[0].normalized.normal_form.strip()
+        if not re.match(url_regexp, word):
+            normal = morph.parse(word)[0].normalized.normal_form.strip()
+            if not normal in stopwords.words('russian') + ['это', 'россия', 'украина', 'либо', 'когда', 'также', 'рф', 'который', 'туда']:
+                res = res + " " + normal
     return res
 
 

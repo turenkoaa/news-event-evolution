@@ -69,10 +69,14 @@ def get_Persons(text):
 def get_persons(text):
     extractor = NamesExtractor()
     matches = extractor(text)
-    return list(map(lambda name: (name.fact.first + " " if name.fact.first != None else "")
+    persons = list(map(lambda name: (name.fact.first + " " if name.fact.first != None else "")
                          + (name.fact.middle + " " if name.fact.middle != None else "")
                          + (name.fact.last if name.fact.last != None else ""),
                     matches))
+    uniq = []
+    for k in persons:
+        uniq = uniq + k.split()
+    return list(set(uniq))
 
 
 def get_Locations(text):
@@ -84,7 +88,11 @@ def get_Locations(text):
 def get_locations(text):
     extractor = LocationExtractor()
     matches = list(filter(lambda m: m.fact.name != "россия", extractor(text)))
-    return list(map(lambda m: m.fact.name, matches))
+    locations = list(map(lambda m: m.fact.name, matches))
+    uniq = []
+    for k in locations:
+        uniq = uniq + k.split()
+    return list(set(uniq))
 
 
 

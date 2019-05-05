@@ -65,7 +65,7 @@ def get_preprocessed_data_file(date):
 
 
 def get_preprocessed_officialGroup_data_file(date):
-    return "C:/Users/User/Desktop/diploma/ner/preprocessed_official_group/" + date
+    return "C:/Users/User/Desktop/diploma/ner/preprocessed_official_group_1/" + date
 
 
 def extract_nornalized_texts(news):
@@ -115,8 +115,19 @@ def write_preprocessed_news(date):
     news = read_preprocessed_news(date)
     for story in news:
         story['normalized'] = prepocess_string(story['vanilla'])
+        uniq = []
+        for k in story['persons']:
+            uniq = uniq + k.split()
+        story['persons'] = list(set(uniq))
+
+        uniq = []
+        for k in story['locations']:
+            uniq = uniq + k.split()
+        story['locations'] = list(set(uniq))
+
         extract_keywords_from_story_ranktext(story)
-    with open("C:/Users/User/Desktop/diploma/ner/preprocessed_official_group/" + date, 'w', encoding="utf8") as fp:
+
+    with open("C:/Users/User/Desktop/diploma/ner/preprocessed_official_group_1/" + date, 'w', encoding="utf8") as fp:
         json.dump(news, fp, ensure_ascii=False)
 
 
@@ -124,6 +135,7 @@ def write_preprocessed_news(date):
 # d2 = datetime.date(2018, 12, 31)
 # dates = get_dates_between(d1, d2)
 # for date in dates:
+#     print("date: " + str(date))
 #     write_preprocessed_news(date)
 
 

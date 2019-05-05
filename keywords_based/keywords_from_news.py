@@ -75,4 +75,8 @@ def extract_keywords_from_news_rake(news):
 def extract_keywords_from_news(news, T):
     extract_keywords_from_news_tf_idf(news, T)
     for story in news:
-        story['keywords'] = list(set(story['keywords_t'] + story['keywords_r'] + story['persons'] + story['locations']))
+        keywords_t = list(map(lambda w: w.strip(), story['keywords_t']))
+        keywords_r = list(map(lambda w: w.strip(), story['keywords_r']))
+        persons = list(map(lambda w: w.strip(), story['persons']))
+        locations = list(map(lambda w: w.strip(), story['locations']))
+        story['keywords'] = list(set(keywords_t + keywords_r + persons + locations) - {'россия', 'украина'})
