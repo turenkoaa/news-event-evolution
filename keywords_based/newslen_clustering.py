@@ -3,21 +3,11 @@ import json
 
 import community
 import networkx as nx
-import numpy
 import pandas as pd
-
 import numpy as np
-
 from keywords_based.evaluate import num_of_communities_by_threshold_range_plot
-from keywords_based.keywords_from_news import extract_keywords_from_news_tf_idf, \
-    extract_keywords_from_news_rake, extract_keywords_from_news_ranktext, extract_keywords_from_news
-from read_news import get_dates_between, read_preprocessed_news_for_dates
 from similarity import get_jaccard_entities_sim
-from story_clustering import calculate_events_clusters, enrich_events_with_date, \
-    create_events_graph, enrich_events_with_keywords_union, enrich_events_with_keywords_intersection, \
-    enrich_events_with_top_n_keywords, \
-    enrich_events_with_keywords_intersection_with_param, story_to_event_mapping
-from visualization import draw_graph, draw_graph3
+from story_clustering import create_events_graph, enrich_events_with_keywords_intersection_with_param
 import matplotlib.pyplot as plt
 
 
@@ -63,7 +53,7 @@ def get_stories_for_news(news, events, dates):
 
     num_of_communities_by_threshold_range_plot(events_sim)
 
-    edges = create_events_graph(0.1, events_sim)
+    edges = create_events_graph(0.18, events_sim)
 
     df = pd.DataFrame({'from': edges[0], 'to': edges[1]})
     G = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.Graph())
@@ -93,10 +83,8 @@ def get_stories_for_news(news, events, dates):
             nx.draw_networkx_nodes(G, pos, list_nodes, labels=labels, with_labels=True, node_size=20,
                                    node_color=str(count / size))
 
-            events_from_story = []
+            news_by_dates = {date: [] for date in dates}
             for node in list_nodes:
-                news_by_dates = {date: [] for date in dates}
-
                 for doc in events[node]['news']:
                     news_by_dates[news[doc]['date']].append({
                         'documentId': news[doc]['documentId'],
@@ -104,16 +92,9 @@ def get_stories_for_news(news, events, dates):
                         'date': news[doc]['date']
                     })
 
-                events_from_story.append({
-                    'id': node,
-                    'news': news_by_dates,
-                    'keywords': events[node]['keywords']
-                }
-                )
-
             stories.append({
                 # 'id': node,
-                'events': events_from_story
+                'events': news_by_dates
             })
         json.dump(stories, write_file, ensure_ascii=False)
 
