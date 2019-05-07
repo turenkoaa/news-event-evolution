@@ -15,15 +15,14 @@ def num_of_communities_by_threshold(t, events_sim):
     return float(len(set(partition.values())))
 
 
-def num_of_communities_by_threshold_range_plot(events_sim):
+def num_of_communities_by_threshold_range_plot(events_sim, dates):
     t = numpy.arange(0.1, 0.3, 0.01)
     s = [num_of_communities_by_threshold(t, events_sim) for t in numpy.arange(0.1, 0.3, 0.01)]
 
     fig, ax = plt.subplots()
     ax.plot(t, s)
 
-    ax.set(xlabel='threshold', ylabel='number of communities',
-           title='')
+    ax.set(xlabel='threshold', ylabel='number of communities', title=dates[0] + ' - ' + dates[-1])
     ax.grid()
 
     fig.savefig("test.png")

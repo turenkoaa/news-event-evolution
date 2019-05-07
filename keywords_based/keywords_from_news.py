@@ -79,4 +79,4 @@ def extract_keywords_from_news(news, T):
         keywords_r = list(map(lambda w: w.strip(), story['keywords_r']))
         persons = list(map(lambda w: w.strip(), story['persons']))
         locations = list(map(lambda w: w.strip(), story['locations']))
-        story['keywords'] = list(set(keywords_t + keywords_r + persons + locations) - {'россия', 'украина'})
+        story['keywords'] = list(set(keywords_t + keywords_r + persons + locations) - {'россия', 'украина', 'владимир'})

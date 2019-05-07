@@ -51,3 +51,17 @@ dates = get_dates_between(d1, d2)
 news = read_preprocessed_news_for_dates(dates)
 # print_number_of_news_clusters_and_texts(news, date)
 print_story_clustering_per_day(news, "16-18")
+
+
+# dates = get_dates_between(d1, d2)
+# tf_idf_keywords_threshold = 0.2
+# news = read_preprocessed_news_for_dates(dates)
+# extract_keywords_from_news(news, tf_idf_keywords_threshold)
+#
+# for tf_idf_keywords_threshold in numpy.arange(0.5, 0.7, 0.05):
+#     extract_keywords_from_news(news, tf_idf_keywords_threshold)
+#     for story in news:
+#         if story['documentId'] == 68681692247385:
+#             print('tf-idf: ' + str(story['keywords_t']))
+#             print('________________')
+#             print(str(len(story['vanilla'].split())))

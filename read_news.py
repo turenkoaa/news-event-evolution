@@ -101,6 +101,17 @@ def read_preprocessed_news(date):
         return news
 
 
+def clear_common_news(news):
+    extract_keywords_from_news(news, 0.243)
+    news_to_ignore = []
+    for story in news:
+        if len(story['keywords_t']) == 0 and len(story['persons'] + story['locations']) > 3:
+            news_to_ignore.append(story['documentId'])
+    for doc in news:
+        if doc['documentId'] in news_to_ignore:
+            news.remove(doc)
+
+
 def read_preprocessed_news_for_dates(dates):
     result = []
     for date in dates:
@@ -108,6 +119,9 @@ def read_preprocessed_news_for_dates(dates):
 
     for i, story in enumerate(result):
         result[i]['index'] = i
+
+    if len(dates) > 6:
+        clear_common_news(result)
     return result
 
 
