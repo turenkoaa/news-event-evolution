@@ -72,7 +72,6 @@ def calculate_events_clusters(news, w, t):
     sim = nallapati_sim(news, w, 1, 1)  # get_cosine_text_sim(news)
     print("Start story clustering...")
     events = story_clustering_to_events(sim, t, max_events_number)
-
     return events
 
 
@@ -100,7 +99,7 @@ def calculate_events_similarity(events, news):
     return events_sim
 
 
-def create_events_graph(threshold, events_sim):
+def calculate_edges(threshold, events_sim):
     result = np.argwhere(events_sim > threshold)
     return result.T
 

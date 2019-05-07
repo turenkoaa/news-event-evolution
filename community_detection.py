@@ -6,7 +6,7 @@ import numpy as np
 
 from read_news import read_preprocessed_news_for_dates, get_dates_between
 from similarity import fresh_look_sim
-from story_clustering import create_events_graph, get_min_date, calculate_events_similarity, enrich_events_with_date
+from story_clustering import calculate_edges, get_min_date, calculate_events_similarity, enrich_events_with_date
 from visualization import draw_graph
 
 d1 = datetime.date(2018, 10, 10)  # start date
@@ -61,7 +61,7 @@ for key in events:
 
 threshold = 0.3
 events_sim = calculate_events_similarity(events, news)
-result = create_events_graph(threshold, events_sim)
+result = calculate_edges(threshold, events_sim)
 draw_graph(result[0], result[1])
 #
 #

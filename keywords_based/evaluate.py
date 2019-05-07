@@ -4,11 +4,11 @@ import numpy
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from story_clustering import create_events_graph
+from story_clustering import calculate_edges
 
 
 def num_of_communities_by_threshold(t, events_sim):
-    edges = create_events_graph(t, events_sim)
+    edges = calculate_edges(t, events_sim)
     df = pd.DataFrame({'from': edges[0], 'to': edges[1]})
     G = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.Graph())
     partition = community.best_partition(G)
@@ -27,3 +27,32 @@ def num_of_communities_by_threshold_range_plot(events_sim, dates):
 
     fig.savefig("test.png")
     plt.show()
+
+
+def get_components_from_graph(G):
+    graphs = list(nx.weakly_connected_component_subgraphs(G))
+    print("Number of components: " + str(len(graphs)))
+    communities = []
+    for g in graphs:
+        com = []
+        for node in g.nodes():
+            com.append(node)
+        communities.append(com)
+
+    return communities
+
+
+def get_communities_from_graph(partition):
+    size = float(len(set(partition.values())))
+    print("Number of communities: " + str(size))
+    communities = []
+    for com in set(partition.values()):
+        communityr = []
+        list_nodes = [nodes for nodes in partition.keys()
+                      if partition[nodes] == com]
+
+        for node in list_nodes:
+            communityr.append(node)
+        communities.append(communityr)
+
+    return communities
