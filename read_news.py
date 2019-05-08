@@ -102,7 +102,7 @@ def read_preprocessed_news(date):
 
 
 def clear_common_news(news):
-    extract_keywords_from_news(news, 0.243)
+    extract_keywords_from_news(news, 0.246)
     news_to_ignore = []
     for story in news:
         if len(story['keywords_t']) == 0 and len(story['persons'] + story['locations']) > 3:
@@ -110,6 +110,8 @@ def clear_common_news(news):
     for doc in news:
         if doc['documentId'] in news_to_ignore:
             news.remove(doc)
+            # print(doc['vanilla'])
+            # print("_______")
 
 
 def read_preprocessed_news_for_dates(dates):
@@ -122,6 +124,18 @@ def read_preprocessed_news_for_dates(dates):
 
     if len(dates) > 6:
         clear_common_news(result)
+    return result
+
+
+def read_news_for_dates(dates):
+    result = {}
+    for date in dates:
+        result[date] = read_preprocessed_news(date)
+
+    # for k in result.items():
+    #     for story in result[k]:
+    #         story['index'] = i
+
     return result
 
 
@@ -141,7 +155,7 @@ def write_preprocessed_news(date):
 
         extract_keywords_from_story_ranktext(story)
 
-    with open("C:/Users/User/Desktop/diploma/ner/preprocessed_official_group_1/" + date, 'w', encoding="utf8") as fp:
+    with open("C:/Users/User/Desktop/diploma/ner/preprocessed_1/" + date, 'w', encoding="utf8") as fp:
         json.dump(news, fp, ensure_ascii=False)
 
 
