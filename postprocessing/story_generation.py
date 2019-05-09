@@ -1,6 +1,6 @@
 import datetime
 from keywords_based.newslen_clustering import get_stories_for_dates
-from read_news import get_dates_between
+from preprocessing.read_news import get_dates_between
 
 
 def get_intersection_percentage_of_clusters(cluster1, cluster2):

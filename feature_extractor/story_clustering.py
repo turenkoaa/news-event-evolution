@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from similarity import nallapati_sim, get_tf_idf
+from feature_extractor.similarity import nallapati_sim, get_tf_idf
 
 
 def story_clustering_to_events(sim_matrix, t, max_events_number):  # 100 mb, 13% cpu, 534 story - 40 sec

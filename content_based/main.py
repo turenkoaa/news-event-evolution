@@ -1,9 +1,9 @@
 from sklearn.metrics.pairwise import cosine_similarity
 
-from read_news import get_dates_between, read_preprocessed_news_for_dates
+from preprocessing.read_news import get_dates_between, read_preprocessed_news_for_dates
 from pylab import *
-from story_clustering import calculate_events_data
-from visualization import draw_graph
+from feature_extractor.story_clustering import calculate_events_data
+from postprocessing.visualization import draw_graph
 
 d1 = datetime.date(2018, 10, 17)  # start date
 d2 = datetime.date(2018, 10, 19)  # end date

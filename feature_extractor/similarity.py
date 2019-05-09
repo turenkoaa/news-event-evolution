@@ -2,8 +2,8 @@ import numpy as np
 from datetime import datetime
 from math import exp
 from sklearn.metrics.pairwise import cosine_similarity
-from read_news import get_dates_between
-from normalize_word import get_tf_idf
+from preprocessing.read_news import get_dates_between
+from preprocessing.normalize_word import get_tf_idf
 
 
 def cosine_sim(text):

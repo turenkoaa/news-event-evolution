@@ -4,10 +4,10 @@ import community
 import networkx as nx
 import numpy as np
 
-from read_news import read_preprocessed_news_for_dates, get_dates_between
-from similarity import fresh_look_sim
-from story_clustering import calculate_edges, get_min_date, calculate_events_similarity, enrich_events_with_date
-from visualization import draw_graph
+from preprocessing.read_news import read_preprocessed_news_for_dates, get_dates_between
+from feature_extractor.similarity import fresh_look_sim
+from feature_extractor.story_clustering import calculate_edges, get_min_date, calculate_events_similarity
+from postprocessing.visualization import draw_graph
 
 d1 = datetime.date(2018, 10, 10)  # start date
 d2 = datetime.date(2018, 10, 12)  # end date

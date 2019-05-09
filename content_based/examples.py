@@ -1,7 +1,6 @@
 import datetime
-import pandas as pd
 
-from read_news import get_dates_between, read_preprocessed_news
+from preprocessing.read_news import get_dates_between, read_preprocessed_news
 
 
 d1 = datetime.date(2018, 10, 10)  # start date

@@ -1,12 +1,12 @@
 import datetime
 
-from read_news import read_cluster, get_dates_between, read_preprocessed_news, read_preprocessed_news_for_dates
-from similarity import nallapati_sim
-from story_clustering import story_clustering_to_events
+from preprocessing.read_news import read_cluster, get_dates_between, read_preprocessed_news_for_dates
+from feature_extractor.similarity import nallapati_sim
+from feature_extractor.story_clustering import story_clustering_to_events
 
 
 def print_number_of_news_clusters_and_texts(news, date):
-    f = open("C:/Users/User/Desktop/diploma/ner/results/clusters_data/" + date + ".txt", "w+", encoding="utf8")
+    f = open("C:/Users/User/Desktop/diploma/ner/data/results/clusters_data/" + date + ".txt", "w+", encoding="utf8")
     cluster_ids = set(map(lambda n: n["clusterId"], news))
     for i in cluster_ids:
         f.write("cluster_id=" + str(i) + "\n")
@@ -31,7 +31,7 @@ def print_story_clustering_per_day(news, date):
     max_events_number = len(set(map(lambda n: n["clusterId"], news))) * 1.5
     sim = nallapati_sim(news, w, 1, 1)  # get_cosine_text_sim(news)
     events = story_clustering_to_events(sim, t, max_events_number)
-    f = open("C:/Users/User/Desktop/diploma/ner/results/story_clustering/lemms/" + date + ".txt", "w+", encoding="utf8")
+    f = open("C:/Users/User/Desktop/diploma/ner/data/results/story_clustering/lemms/" + date + ".txt", "w+", encoding="utf8")
     f.write("Parameters: w=" + str(w) + ", t=" + str(t) + "\n")
 
     for id, docs in events.items():

@@ -1,13 +1,12 @@
 import datetime
 import json
 import os
-import re
 
 from langdetect import detect_langs
 
-from keywords_based.keywords_from_news import extract_keywords_from_news, extract_keywords_from_story_ranktext
-from keywords_extractor import get_persons, get_locations
-from normalize_word import prepocess_string
+from feature_extractor.keywords_from_news import extract_keywords_from_news, extract_keywords_from_story_ranktext
+from feature_extractor.keywords_extractor import get_persons, get_locations
+from preprocessing.normalize_word import prepocess_string
 
 
 def is_lang(text, lang, prob): # print(is_lang("Smth", "ru", 0.75))
@@ -61,11 +60,11 @@ def get_filtered_news_file(date):
 
 
 def get_preprocessed_data_file(date):
-    return "C:/Users/User/Desktop/diploma/ner/preprocessed_data/" + date
+    return "C:/Users/User/Desktop/diploma/ner/data/preprocessed_data/" + date
 
 
 def get_preprocessed_officialGroup_data_file(date):
-    return "C:/Users/User/Desktop/diploma/ner/preprocessed_official_group_1/" + date
+    return "C:/Users/User/Desktop/diploma/ner/data/preprocessed_official_group_1/" + date
 
 
 def extract_nornalized_texts(news):
@@ -155,7 +154,7 @@ def write_preprocessed_news(date):
 
         extract_keywords_from_story_ranktext(story)
 
-    with open("C:/Users/User/Desktop/diploma/ner/preprocessed_1/" + date, 'w', encoding="utf8") as fp:
+    with open("C:/Users/User/Desktop/diploma/ner/data/preprocessed_1/" + date, 'w', encoding="utf8") as fp:
         json.dump(news, fp, ensure_ascii=False)
 
 

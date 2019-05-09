@@ -4,7 +4,7 @@ import numpy
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from story_clustering import calculate_edges
+from feature_extractor.story_clustering import calculate_edges
 
 
 def num_of_communities_by_threshold(t, events_sim):
@@ -25,7 +25,7 @@ def num_of_communities_by_threshold_range_plot(events_sim, dates):
     ax.set(xlabel='threshold', ylabel='number of communities', title=dates[0] + ' - ' + dates[-1])
     ax.grid()
 
-    fig.savefig("test.png")
+    # fig.savefig("test.png")
     plt.show()
 
 

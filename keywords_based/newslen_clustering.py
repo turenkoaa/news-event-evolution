@@ -1,20 +1,17 @@
-import datetime
 import json
 
 import community
 import networkx as nx
 import pandas as pd
 import numpy as np
-from keywords_based.evaluate import num_of_communities_by_threshold_range_plot, get_communities_from_graph, \
-    get_components_from_graph
-from keywords_based.keywords_from_news import extract_keywords_from_news
-from read_news import get_dates_between, read_preprocessed_news_for_dates, read_news_for_dates
-from similarity import get_jaccard_entities_sim
-from story_clustering import calculate_edges, enrich_events_with_keywords_intersection_with_param, \
+from feature_extractor.keywords_from_news import extract_keywords_from_news
+from keywords_based.evaluate import num_of_communities_by_threshold_range_plot
+from preprocessing.read_news import get_dates_between, read_news_for_dates
+from feature_extractor.similarity import get_jaccard_entities_sim
+from feature_extractor.story_clustering import calculate_edges, enrich_events_with_keywords_intersection_with_param, \
     calculate_events_clusters, enrich_events_with_date
 
-from visualization import draw_graph3, communities_to_stories, show_graph_communities, communities_to_stories, \
-    get_stories
+from postprocessing.visualization import show_graph_communities, get_stories
 
 
 def calculate_event_similarity_by_keywords_intersection(events):
@@ -61,15 +58,14 @@ def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshol
     partition = community.best_partition(G)
     stories = get_stories(G, partition, news, events, dates)
 
-    with open("C:/Users/User/Desktop/diploma/ner/results/stories/" + dates[0] + "_" + dates[-1] + ".json", "w", encoding="utf8") as write_file:
+    with open("C:/Users/User/Desktop/diploma/ner/data/results/stories/" + dates[0] + "_" + dates[-1] + ".json", "w", encoding="utf8") as write_file:
         json.dump(stories, write_file, ensure_ascii=False)
 
     show_graph_communities(G, partition, events)
 
     # draw_graph3(edges[0], edges[1])
 
-
-    # num_of_communities_by_threshold_range_plot(events_sim, dates)
+    num_of_communities_by_threshold_range_plot(events_sim, dates)
 
     # for key in events:
     #     print(">>>> " + str(key))
