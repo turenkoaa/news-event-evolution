@@ -114,8 +114,6 @@ def enrich_events_with_keywords_union(events, news):
         keys = []
         for doc in events[key]['news']:
             keys = keys + list(news[doc]['keywords'])
-            keys = keys + news[doc]['persons']
-            keys = keys + news[doc]['locations']
 
         events[key]['keywords'] = set(keys)
 
@@ -125,8 +123,6 @@ def enrich_events_with_keywords_intersection(events, news):
         keys = news[events[key]['news'][0]]['keywords']
         for doc in events[key]['news']:
             keys = set.intersection(set(news[doc]['keywords']), keys)
-            keys = set.intersection(set(news[doc]['persons']), keys)
-            keys = set.intersection(set(news[doc]['locations']), keys)
 
         events[key]['keywords'] = keys
 
@@ -137,14 +133,12 @@ def enrich_events_with_keywords_intersection_with_param(events, news, threshold)
         keys = []
         for doc in events[key]['news']:
             keys = keys + list(news[doc]['keywords'])
-            keys = keys + news[doc]['persons']
-            keys = keys + news[doc]['locations']
 
         amount = len(events[key]['news'])
         for keyword in set(keys):
             count = 0
             for doc in events[key]['news']:
-                if keyword in list(news[doc]['keywords']) + news[doc]['persons'] + news[doc]['locations']:
+                if keyword in list(news[doc]['keywords']):
                     count = count + 1
             if float(count) / amount > threshold:
                 events[key]['keywords'].append(keyword)

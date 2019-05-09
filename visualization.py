@@ -5,6 +5,8 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 
+from keywords_based.evaluate import get_communities_from_graph
+
 
 def draw_graph(fromV, toV):
     df = pd.DataFrame({'from': fromV, 'to': toV})
@@ -42,11 +44,10 @@ def communities_to_stories(G, partition, news, events, dates):
     print("events number: " + str(len(events)))
     print("single stories number: " + str(len(single)))
 
-    count = 0.
     stories = []
 
     for com in set(partition.values()):
-        count = count + 1.
+
         list_nodes = [nodes for nodes in partition.keys()
                       if partition[nodes] == com]
 
@@ -68,33 +69,49 @@ def communities_to_stories(G, partition, news, events, dates):
     return stories
 
 
-def communities_to_stories(G, partition, news, events, dates):
+def get_stories(G, partition, news, events, dates):
     single = set(range(len(events))) - set(G.nodes())
-    print("news number: " + str(len(news)))
-    print("events number: " + str(len(events)))
-    print("single stories number: " + str(len(single)))
+    communities = get_communities_from_graph(partition)
 
-    count = 0.
-    stories = {'events': []}
+    stories = {
+        'newsNumber': len(news),
+        'eventsNumber': len(events),
+        'singleNewsNumber': (len(single)),
+        'storiesNumber': (len(communities)),
+        'stories': []
+    }
 
     for com in set(partition.values()):
-        count = count + 1.
         list_nodes = [nodes for nodes in partition.keys()
                       if partition[nodes] == com]
 
         events_by_dates = {date: [] for date in dates}
-        for node in list_nodes:
+        # result_events_by_dates = {}
+        for event_idx in list_nodes:
+            event = events[event_idx]
             news_by_event = [{
                     'documentId': news[doc]['documentId'],
-                    'text': news[doc]['vanilla'],
-                    'date': news[doc]['date']
-                } for doc in events[node]['news']]
-            events_by_dates[events[node]['date']].append({
-                'news': news_by_event,
-                'keywords': events[node]['keywords']
+                    'text': news[doc]['vanilla']
+                } for doc in event['news']]
+
+            events_by_dates[event['date']].append({
+                'event': news_by_event,
+                'keywords': event['keywords']
             })
 
-        stories['events'].append(events_by_dates)
+        # for date in events_by_dates:
+        #     if not len(events_by_dates[date]) == 0:
+        #         result_events_by_dates[date] = events_by_dates[date]
+
+        stories['newsNumber'] = len(news)
+        stories['eventsNumber'] = len(events)
+        stories['singleNewsNumber'] = (len(single))
+        stories['storiesNumber'] = (len(communities))
+
+        stories['stories'].append({
+            'storyId': events[list_nodes[0]]['start_time'],
+            'events': events_by_dates  # result_events_by_dates
+        })
 
     return stories
 
@@ -102,7 +119,7 @@ def communities_to_stories(G, partition, news, events, dates):
 def show_graph_communities(G, partition, events):
     labels = {}
     for node in G.nodes():
-        labels[node] = events[node]['keywords'][1]
+        labels[node] = events[node]['keywords'][0]
 
     pos = nx.spring_layout(G)
 

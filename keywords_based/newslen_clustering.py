@@ -13,7 +13,8 @@ from similarity import get_jaccard_entities_sim
 from story_clustering import calculate_edges, enrich_events_with_keywords_intersection_with_param, \
     calculate_events_clusters, enrich_events_with_date
 
-from visualization import draw_graph3, communities_to_stories, show_graph_communities, communities_to_stories
+from visualization import draw_graph3, communities_to_stories, show_graph_communities, communities_to_stories, \
+    get_stories
 
 
 def calculate_event_similarity_by_keywords_intersection(events):
@@ -49,13 +50,16 @@ def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshol
     events_sim = calculate_event_similarity_by_keywords_Jaccard(events)
 
     edges = calculate_edges(edges_threshold, events_sim)
+    # weighted_edges = [(edge[0], edge[1], dict(weight=events_sim[edge[0]][edge[1]])) for edge in edges.T]
+    # G = nx.Graph(weighted_edges)
+    # partition = community.best_partition(G, weight='weight')
 
     df = pd.DataFrame({'from': edges[0], 'to': edges[1]})
     G = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.Graph())
     diG = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.DiGraph())
 
     partition = community.best_partition(G)
-    stories = communities_to_stories(G, partition, news, events, dates)
+    stories = get_stories(G, partition, news, events, dates)
 
     with open("C:/Users/User/Desktop/diploma/ner/results/stories/" + dates[0] + "_" + dates[-1] + ".json", "w", encoding="utf8") as write_file:
         json.dump(stories, write_file, ensure_ascii=False)
@@ -64,8 +68,7 @@ def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshol
 
     # draw_graph3(edges[0], edges[1])
 
-    communities = get_communities_from_graph(partition)
-    components = get_components_from_graph(diG)
+
     # num_of_communities_by_threshold_range_plot(events_sim, dates)
 
     # for key in events:
