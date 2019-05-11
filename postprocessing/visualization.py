@@ -74,15 +74,11 @@ def get_stories(G, clusters, news, events, dates):
         # result_events_by_dates = {}
         for event_idx in cluster:
             event = events[event_idx]
-            news_by_event = [{
-                    'documentId': news[doc]['documentId'],
-                    'text': news[doc]['vanilla']
-                } for doc in event['news']]
-
-            events_by_dates[event['date']].append({
-                'event': news_by_event,
-                'keywords': event['keywords']
-            })
+            for doc in event['news']:
+                events_by_dates[event['date']].append({
+                     'documentId': news[doc]['documentId'],
+                     'text': news[doc]['vanilla']
+                })
 
         # for date in events_by_dates:
         #     if not len(events_by_dates[date]) == 0:

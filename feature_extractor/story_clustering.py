@@ -71,7 +71,7 @@ def calculate_events_data(news, w, t):
 def calculate_events_clusters(news, w, t):
     max_events_number = len(set(map(lambda n: n["clusterId"], news))) * 1.5
     sim = nallapati_sim(news, w, 1, 1)  # get_cosine_text_sim(news)
-    print("Start story clustering...")
+    # print("Start story clustering...")
     events = story_clustering_to_events(sim, t, max_events_number)
     return events
 

@@ -98,10 +98,10 @@ def calculate_events(news_by_dates, w, t):
 def get_stories_for_dates(d1, d2):
     dates = get_dates_between(d1, d2)
     w = [0.7, 0.15, 0.15]
-    t = 0.2  # 0.1
+    t = 0.3  # 0.1
     tf_idf_keywords_threshold = 0.25
-    keywords_threshold = t
-    edges_threshold = 0.15
+    keywords_threshold = 0.4
+    edges_threshold = 0.2
 
     news, events = calculate_events(read_news_for_dates(dates), w, t)
     extract_keywords_from_news(list(news.values()), tf_idf_keywords_threshold)
