@@ -42,16 +42,15 @@ def get_components_from_graph(G):
     return communities
 
 
-def get_communities_from_graph(partition):
-    size = float(len(set(partition.values())))
+def get_communities_from_graph(clusters):
+    size = float(len(clusters))
     print("Number of communities: " + str(size))
     communities = []
-    for com in set(partition.values()):
+    for com in clusters:
         communityr = []
-        list_nodes = [nodes for nodes in partition.keys()
-                      if partition[nodes] == com]
 
-        for node in list_nodes:
+
+        for node in com:
             communityr.append(node)
         communities.append(communityr)
 

@@ -60,8 +60,9 @@ def calculate_events_data(news, w, t):
     events = calculate_events_clusters(news, w, t)
 
     print("Start computation of event term vectors...")
-    events_data['news'] = news
     events_data['events'] = events
+    for key in events:
+        events[key]['date'] = news[events[key]['news'][0]]['date']
     events_data['event_term_vectors'] = get_event_term_vectors1(events, news)
 
     return events_data

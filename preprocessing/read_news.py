@@ -109,8 +109,8 @@ def clear_common_news(news):
     for doc in news:
         if doc['documentId'] in news_to_ignore:
             news.remove(doc)
-            # print(doc['vanilla'])
-            # print("_______")
+            print(doc['vanilla'])
+            print("_______")
 
 
 def read_preprocessed_news_for_dates(dates):

@@ -18,7 +18,10 @@ def map_clusters_to_ids(data, dates):
             for event in cluster['events'][date]:
                 for story in event['event']:
                     ids.append(story['documentId'])
-        clusters[cluster['storyId']] = ids
+        clusters[cluster['storyId']] = {
+            'ids': ids,
+            'cluster': cluster
+        }
     return clusters
 
 
@@ -36,26 +39,31 @@ old_clusters = get_stories_for_dates(d1, d2)
 new_clusters = get_stories_for_dates(d1_window, d2_window)
 
 
-old_ids = map_clusters_to_ids(old_clusters, dates_intersect)
-new_ids = map_clusters_to_ids(new_clusters, dates_intersect)
+old_stories = map_clusters_to_ids(old_clusters, dates_intersect)
+new_stories = map_clusters_to_ids(new_clusters, dates_intersect)
 
-to_link = []
-for old_id in old_ids:
-    for new_id in new_ids:
-        intersection = get_intersection_percentage_of_clusters(old_ids[old_id], new_ids[new_id])
+to_link = {}
+for old_id in old_stories:
+    for new_id in new_stories:
+        intersection = get_intersection_percentage_of_clusters(old_stories[old_id]['ids'], new_stories[new_id]['ids'])
         if intersection > 0.5:
-            to_link.append((old_id, new_id))
+            if old_id in to_link.keys():
+                to_link[old_id].append(new_id)
+            else:
+                to_link[old_id] = [new_id]
 
 print(to_link)
 
 
-# for old_cluster in old_clusters:
-#     ids1 = get_news_ids_for_dates_from_cluster(old_cluster, d1_intersect, d2_intersect)
-#     for new_cluster in new_clusters:
-#         ids2 = get_news_ids_for_dates_from_cluster(new_cluster, d1_intersect, d2_intersect)
-#         intersection = get_intersection_percentage_of_clusters(ids1, ids2)
-#         if intersection > 0.5:
-#             link
+def merge(old_cluster, to_merge):
+    print(to_merge)
+
+
+for old_cluster in old_clusters['stories']:
+    storyId = old_cluster['storyId']
+    if old_cluster['storyId'] in to_link.keys():
+        merge(old_cluster, map(lambda id: new_stories[id]['cluster'], to_link[storyId]))
+
 
 
 

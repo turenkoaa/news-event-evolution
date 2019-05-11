@@ -11,7 +11,7 @@ from feature_extractor.similarity import get_jaccard_entities_sim
 from feature_extractor.story_clustering import calculate_edges, enrich_events_with_keywords_intersection_with_param, \
     calculate_events_clusters, enrich_events_with_date
 
-from postprocessing.visualization import show_graph_communities, get_stories
+from postprocessing.visualization import show_graph_communities, get_stories_by_partition, to_json
 
 
 def calculate_event_similarity_by_keywords_intersection(events):
@@ -56,17 +56,13 @@ def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshol
     diG = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.DiGraph())
 
     partition = community.best_partition(G)
-    stories = get_stories(G, partition, news, events, dates)
+    stories = get_stories_by_partition(G, partition, news, events, dates)
 
-    with open("C:/Users/User/Desktop/diploma/ner/data/results/stories/" + dates[0] + "_" + dates[-1] + ".json", "w", encoding="utf8") as write_file:
-        json.dump(stories, write_file, ensure_ascii=False)
+    to_json(stories, "C:/Users/User/Desktop/diploma/ner/data/results/keywords_based/stories/" + dates[0] + "_" + dates[-1] + ".json")
 
-    show_graph_communities(G, partition, events)
-
+    # show_graph_communities(G, partition, events)
     # draw_graph3(edges[0], edges[1])
-
-    num_of_communities_by_threshold_range_plot(events_sim, dates)
-
+    # num_of_communities_by_threshold_range_plot(events_sim, dates)
     # for key in events:
     #     print(">>>> " + str(key))
     #     for doc in events[key]['news']:
@@ -102,10 +98,10 @@ def calculate_events(news_by_dates, w, t):
 def get_stories_for_dates(d1, d2):
     dates = get_dates_between(d1, d2)
     w = [0.7, 0.15, 0.15]
-    t = 0.3  # 0.1
+    t = 0.2  # 0.1
     tf_idf_keywords_threshold = 0.25
-    keywords_threshold = 0.4
-    edges_threshold = 0.2
+    keywords_threshold = t
+    edges_threshold = 0.15
 
     news, events = calculate_events(read_news_for_dates(dates), w, t)
     extract_keywords_from_news(list(news.values()), tf_idf_keywords_threshold)

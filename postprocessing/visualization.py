@@ -8,11 +8,7 @@ import matplotlib.pyplot as plt
 from keywords_based.evaluate import get_communities_from_graph
 
 
-def draw_graph(fromV, toV):
-    df = pd.DataFrame({'from': fromV, 'to': toV})
-
-    # Build your graph
-    G = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.DiGraph())
+def draw_graph(G):
     graphs = list(nx.weakly_connected_component_subgraphs(G))
     print("Number of Stories: " + str(len(graphs)))
 
@@ -21,7 +17,7 @@ def draw_graph(fromV, toV):
 
     # Plot it
         nx.draw(g, pos, with_labels=True)
-        plt.show()
+    plt.show()
 
 
 def draw_graph3(fromV, toV):
@@ -38,40 +34,32 @@ def draw_graph3(fromV, toV):
     plt.show()
 
 
-def communities_to_stories(G, partition, news, events, dates):
-    single = set(range(len(events))) - set(G.nodes())
-    print("news number: " + str(len(news)))
-    print("events number: " + str(len(events)))
-    print("single stories number: " + str(len(single)))
-
-    stories = []
-
+def get_stories_by_partition(G, partition, news, events, dates):
+    clusters = []
     for com in set(partition.values()):
-
         list_nodes = [nodes for nodes in partition.keys()
                       if partition[nodes] == com]
+        clusters.append(list_nodes)
 
-        news_by_dates = {date: [] for date in dates}
-        for node in list_nodes:
-            for doc in events[node]['news']:
-                news_by_dates[news[doc]['date']].append({
-                    'documentId': news[doc]['documentId'],
-                    'text': news[doc]['vanilla'],
-                    'date': news[doc]['date']
-                })
-
-        stories.append({
-            # 'id': node,
-            'events': news_by_dates
-        })
+    return get_stories(G, clusters, news, events, dates)
 
 
-    return stories
+def get_stories_by_components(G, news, events, dates):
+    graphs = list(nx.weakly_connected_component_subgraphs(G))
+    clusters = []
+
+    for g in graphs:
+        res = []
+        for node in g.nodes():
+            res.append(node)
+        clusters.append(res)
+
+    return get_stories(G, clusters, news, events, dates)
 
 
-def get_stories(G, partition, news, events, dates):
+def get_stories(G, clusters, news, events, dates):
     single = set(range(len(events))) - set(G.nodes())
-    communities = get_communities_from_graph(partition)
+    communities = get_communities_from_graph(clusters)
 
     stories = {
         'newsNumber': len(news),
@@ -81,13 +69,10 @@ def get_stories(G, partition, news, events, dates):
         'stories': []
     }
 
-    for com in set(partition.values()):
-        list_nodes = [nodes for nodes in partition.keys()
-                      if partition[nodes] == com]
-
+    for cluster in clusters:
         events_by_dates = {date: [] for date in dates}
         # result_events_by_dates = {}
-        for event_idx in list_nodes:
+        for event_idx in cluster:
             event = events[event_idx]
             news_by_event = [{
                     'documentId': news[doc]['documentId'],
@@ -109,7 +94,7 @@ def get_stories(G, partition, news, events, dates):
         stories['storiesNumber'] = (len(communities))
 
         stories['stories'].append({
-            'storyId': events[list_nodes[0]]['start_time'],
+            'storyId': events[cluster[0]]['start_time'],
             'events': events_by_dates  # result_events_by_dates
         })
 
@@ -133,3 +118,8 @@ def show_graph_communities(G, partition, events):
     plt.axis('off')
     plt.savefig("labels_and_colors.png")
     plt.show()
+
+
+def to_json(data, file_name):
+    with open(file_name, "w", encoding="utf8") as write_file:
+        json.dump(data, write_file, ensure_ascii=False)
