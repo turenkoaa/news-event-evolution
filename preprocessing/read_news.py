@@ -60,7 +60,7 @@ def get_filtered_news_file(date):
 
 
 def get_preprocessed_data_file(date):
-    return "C:/Users/User/Desktop/diploma/ner/data/preprocessed_data/" + date
+    return "C:/Users/User/Desktop/diploma/ner/data/preprocessed_1/" + date
 
 
 def get_preprocessed_officialGroup_data_file(date):
@@ -95,7 +95,7 @@ def preprocess_news(date):
 
 
 def read_preprocessed_news(date):
-    with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
+    with open(get_preprocessed_data_file(date), 'r', encoding="utf8") as fp:
         news = json.load(fp)
         return news
 

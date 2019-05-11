@@ -96,6 +96,7 @@ def calculate_events(news_by_dates, w, t):
 
 
 def get_stories_for_dates(d1, d2):
+    print("Getting stories for " + d1.strftime("%Y-%m-%d") + ' - ' + d2.strftime("%Y-%m-%d") + "...")
     dates = get_dates_between(d1, d2)
     w = [0.7, 0.15, 0.15]
     t = 0.3  # 0.1
