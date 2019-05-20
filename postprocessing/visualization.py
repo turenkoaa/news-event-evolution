@@ -6,6 +6,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from keywords_based.evaluate import get_communities_from_graph
+from preprocessing.normalize_word import remove_urls
 
 
 def draw_graph(G):
@@ -41,7 +42,7 @@ def get_stories_by_partition(G, partition, news, events, dates):
                       if partition[nodes] == com]
         clusters.append(list_nodes)
 
-    return get_stories(G, clusters, news, events, dates)
+    return get_stories(G, clusters, news, events, dates), get_toloka(clusters, news, events)
 
 
 def get_stories_by_components(G, news, events, dates):
@@ -54,12 +55,13 @@ def get_stories_by_components(G, news, events, dates):
             res.append(node)
         clusters.append(res)
 
-    return get_stories(G, clusters, news, events, dates)
+    return get_stories(G, clusters, news, events, dates), get_toloka(clusters, news, events)
 
 
 def get_stories(G, clusters, news, events, dates):
     single = set(range(len(events))) - set(G.nodes())
     communities = get_communities_from_graph(clusters)
+    # num_of_communities_by_threshold_range_plot(events_sim, dates)
 
     stories = {
         'newsNumber': len(news),
@@ -97,7 +99,35 @@ def get_stories(G, clusters, news, events, dates):
     return stories
 
 
-def show_graph_communities(G, partition, events):
+def get_toloka(clusters, news, events):
+    toloka_news = {}
+
+    for cluster in clusters:
+        story_id = events[cluster[0]]['start_time']
+        toloka_news[story_id] = []
+        for event_idx in cluster:
+            event = events[event_idx]
+            doc1 = news[event['news'][0]]
+            toloka_news[story_id].append(remove_urls(doc1['vanilla']))
+
+    toloka = []
+    count = 0
+    for story in toloka_news.values():
+        for i in range(0, len(story)):
+            for j in range(i + 1, len(story)):
+                toloka.append({
+                    "id": str(count),
+                    "input_values": {
+                        "story1": story[i],
+                        "story2": story[j]
+                    }
+                })
+                count = count + 1
+
+    return toloka
+
+
+def show_graph_communities(G, partition, events, file):
     labels = {}
     for node in G.nodes():
         labels[node] = events[node]['keywords'][0]
@@ -112,8 +142,8 @@ def show_graph_communities(G, partition, events):
     nx.draw_networkx_labels(G, pos, labels, font_size=6)
 
     plt.axis('off')
-    plt.savefig("labels_and_colors.png")
-    plt.show()
+    plt.savefig(file)
+    plt.clf()
 
 
 def to_json(data, file_name):

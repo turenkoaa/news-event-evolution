@@ -27,10 +27,10 @@ def map_clusters_to_ids(data, dates):
     return clusters
 
 
-d1 = datetime.date(2018, 10, 10)  # start date
-d2 = datetime.date(2018, 10, 16)
-end_date = datetime.date(2018, 11, 10)
-step = 3
+d1 = datetime.date(2018, 10, 24)  # start date
+d2 = datetime.date(2018, 10, 30)
+end_date = datetime.date(2018, 11, 17)
+step = 7
 window = 6
 old_clusters = get_stories_for_dates_content(d1, d2)['stories']
 
@@ -92,7 +92,8 @@ while True:
     d1 = d1_window
     d2 = d2_window
 
-with open("C:/Users/User/Desktop/diploma/ner/data/results/content_based/stories/fu.json", "w", encoding="utf8") as write_file:
+
+with open("C:/Users/User/Desktop/diploma/ner/data/results/keywords_based/stories/fu.json", "w", encoding="utf8") as write_file:
     json.dump(old_clusters, write_file, ensure_ascii=False)
 
 

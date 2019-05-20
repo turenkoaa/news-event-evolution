@@ -2,15 +2,17 @@ import json
 
 import community
 import networkx as nx
+import numpy
 import pandas as pd
 import numpy as np
 from feature_extractor.keywords_from_news import extract_keywords_from_news
-from keywords_based.evaluate import num_of_communities_by_threshold_range_plot
+from keywords_based.evaluate import num_of_communities_by_threshold_range_plot, edges_distribution_plot, \
+    number_of_nodes_and_edges
 from preprocessing.read_news import get_dates_between, read_news_for_dates
 from feature_extractor.similarity import get_jaccard_entities_sim
 from feature_extractor.story_clustering import calculate_edges, enrich_events_with_keywords_intersection_with_param, \
     calculate_events_clusters, enrich_events_with_date
-
+import matplotlib.pyplot as plt
 from postprocessing.visualization import show_graph_communities, get_stories_by_partition, to_json
 
 
@@ -43,6 +45,7 @@ def calculate_event_similarity_by_keywords_Jaccard(events):
 
 
 def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshold):
+    dir = "C:/Users/User/Desktop/diploma/ner/data/results/keywords_based/"
     enrich_events_with_keywords_intersection_with_param(events, news, keywords_threshold)
     events_sim = calculate_event_similarity_by_keywords_Jaccard(events)
 
@@ -56,18 +59,16 @@ def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshol
     diG = nx.from_pandas_edgelist(df, source='from', target='to', create_using=nx.DiGraph())
 
     partition = community.best_partition(G)
-    stories = get_stories_by_partition(G, partition, news, events, dates)
+    stories, toloka = get_stories_by_partition(G, partition, news, events, dates)
 
-    to_json(stories, "C:/Users/User/Desktop/diploma/ner/data/results/keywords_based/stories/" + dates[0] + "_" + dates[-1] + ".json")
+    to_json(stories, dir + "stories/" + dates[0] + "_" + dates[-1] + ".json")
+    to_json(toloka, dir + "stories/toloka/" + dates[0] + "_" + dates[-1] + ".json")
 
-    # show_graph_communities(G, partition, events)
+    show_graph_communities(G, partition, events, dir + "/graph/communities_" + dates[0] + "_" + dates[-1] + ".png")
     # draw_graph3(edges[0], edges[1])
-    # num_of_communities_by_threshold_range_plot(events_sim, dates)
-    # for key in events:
-    #     print(">>>> " + str(key))
-    #     for doc in events[key]['news']:
-    #         print(news[doc]['vanilla'])
-    #         print('_________________')
+    avg = edges_distribution_plot(events_sim, dir + "evaluate/distribution_edge_weights_" + str(len(news)) + "_" + dates[0] + '_' + dates[-1] + ".png")
+    num_of_communities_by_threshold_range_plot(events_sim, avg, dir + "evaluate/number_of_communities_" + str(len(news)) + "_" + dates[0] + '_' + dates[-1] + ".png")
+    number_of_nodes_and_edges(events_sim, avg, dir + "evaluate/nodes_ans_edges_" + str(len(news)) + "_" + dates[0] + '_' + dates[-1] + ".png")
 
     return stories
 

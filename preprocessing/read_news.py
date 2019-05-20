@@ -95,7 +95,7 @@ def preprocess_news(date):
 
 
 def read_preprocessed_news(date):
-    with open(get_preprocessed_data_file(date), 'r', encoding="utf8") as fp:
+    with open(get_preprocessed_officialGroup_data_file(date), 'r', encoding="utf8") as fp:
         news = json.load(fp)
         return news
 

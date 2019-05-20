@@ -27,6 +27,14 @@ def prepocess_string(text):
     return res
 
 
+def remove_urls(text):
+    res = ""
+    for word in text.split():
+        if not re.match(url_regexp, word):
+            res = res + " " + word
+    return res
+
+
 def get_tf_idf(texts, use_idf):
     ru_stop_words = get_stop_words('russian')
     vectorizer = TfidfVectorizer(use_idf=use_idf,
