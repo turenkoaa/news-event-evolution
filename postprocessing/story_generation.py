@@ -27,12 +27,12 @@ def map_clusters_to_ids(data, dates):
     return clusters
 
 
-d1 = datetime.date(2018, 10, 24)  # start date
-d2 = datetime.date(2018, 10, 30)
-end_date = datetime.date(2018, 11, 17)
+d1 = datetime.date(2018, 10, 10)  # start date
+d2 = datetime.date(2018, 10, 12)
+end_date = datetime.date(2018, 10, 17)
 step = 7
 window = 6
-old_clusters = get_stories_for_dates_content(d1, d2)['stories']
+old_clusters = get_stories_for_dates(d1, d2)['stories']
 
 
 while True:
@@ -45,7 +45,7 @@ while True:
     dates_intersect = get_dates_between(d1_window, d2)
     dates_union = get_dates_between(d1_window, d2_window)
 
-    new_clusters = get_stories_for_dates_content(d1_window, d2_window)['stories']
+    new_clusters = get_stories_for_dates(d1_window, d2_window)['stories']
 
     for old_cluster in old_clusters:
         for date in dates_union:

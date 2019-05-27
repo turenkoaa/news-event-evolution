@@ -127,10 +127,13 @@ def get_toloka(clusters, news, events):
     return toloka
 
 
-def show_graph_communities(G, partition, events, file):
+def show_graph_communities(news, G, partition, events, file):
     labels = {}
     for node in G.nodes():
         labels[node] = events[node]['keywords'][0]
+        G.node[node]['label'] = remove_urls(news[events[node]['news'][0]]['vanilla'])
+        G.node[node]['color'] = partition.get(node)
+        # G.node[node]['keywords'] = events[node]['keywords']
 
     pos = nx.spring_layout(G)
 
@@ -140,6 +143,7 @@ def show_graph_communities(G, partition, events, file):
 
     nx.draw_networkx_edges(G, pos, alpha=0.5)
     nx.draw_networkx_labels(G, pos, labels, font_size=6)
+    nx.write_gexf(G, "test.gexf")
 
     plt.axis('off')
     plt.savefig(file)

@@ -64,7 +64,7 @@ def get_stories_for_news(news, events, dates, keywords_threshold, edges_threshol
     to_json(stories, dir + "stories/" + dates[0] + "_" + dates[-1] + ".json")
     to_json(toloka, dir + "stories/toloka/" + dates[0] + "_" + dates[-1] + ".json")
 
-    show_graph_communities(G, partition, events, dir + "/graph/communities_" + dates[0] + "_" + dates[-1] + ".png")
+    show_graph_communities(news, G, partition, events, dir + "/graph/communities_" + dates[0] + "_" + dates[-1] + ".png")
     # draw_graph3(edges[0], edges[1])
     avg = edges_distribution_plot(events_sim, dir + "evaluate/distribution_edge_weights_" + str(len(news)) + "_" + dates[0] + '_' + dates[-1] + ".png")
     num_of_communities_by_threshold_range_plot(events_sim, avg, dir + "evaluate/number_of_communities_" + str(len(news)) + "_" + dates[0] + '_' + dates[-1] + ".png")
