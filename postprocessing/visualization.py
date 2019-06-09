@@ -131,7 +131,7 @@ def show_graph_communities(news, G, partition, events, file):
     labels = {}
     for node in G.nodes():
         labels[node] = events[node]['keywords'][0]
-        G.node[node]['label'] = remove_urls(news[events[node]['news'][0]]['vanilla'])
+        G.node[node]['label'] = "(" + news[events[node]['news'][0]]['date'] + ") " + remove_urls(news[events[node]['news'][0]]['vanilla'])[:155]
         G.node[node]['color'] = partition.get(node)
         # G.node[node]['keywords'] = events[node]['keywords']
 

@@ -28,11 +28,11 @@ def map_clusters_to_ids(data, dates):
 
 
 d1 = datetime.date(2018, 10, 10)  # start date
-d2 = datetime.date(2018, 10, 12)
+d2 = datetime.date(2018, 10, 17)
 end_date = datetime.date(2018, 10, 17)
 step = 7
 window = 6
-old_clusters = get_stories_for_dates(d1, d2)['stories']
+old_clusters = get_stories_for_dates_content(d1, d2)['stories']
 
 
 while True:
